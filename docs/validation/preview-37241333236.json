@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-05",
+  "route": "B",
+  "run_url": "https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37241333236",
+  "result": "PASS",
+  "framework_commit": "8311a047dc823baa24e4def345c085b16fece742",
+  "source_commit": "0fb9b10cb9df51fb076470e1dd93d1c30dd89d83",
+  "baseline_config_sha256": "f95db1551b3fed8f21f7db97e6a5a1b8227f0283fa5689ac66699c8892737aa2",
+  "final_config_sha256": "b381caf9ddddc94b99e659777e2a48a67d9c7562a3350b234647a8366a16fb5f",
+  "protected_diff_bytes": 0,
+  "protected_setting_count": 483,
+  "additional_kernel_check": "NSS/ATH11K/IPQ/SKB_RECYCLER/CPU frequency unchanged",
+  "applications": "Required packages selected; excluded applications absent",
+  "device": "RE-CS-02 selected; QCN9074 per-device firmware retained",
+  "docker_dependencies": "Four cgroup settings and packaged bridge/netfilter/iptables compatibility dependencies automatically selected by native Docker Kconfig",
+  "firmware_build": "not completed",
+  "device_tests": "not performed"
+}
