@@ -1,6 +1,9 @@
 name: Athena VIKINGYFY
-run-name: Athena B - ${{ inputs.preview && 'defconfig preview' || 'firmware build' }}
+run-name: Athena B - ${{ (github.event_name != 'workflow_dispatch' || inputs.preview) && 'defconfig preview' || 'firmware build' }}
 on:
+  push:
+    paths:
+      - '.github/workflows/ATHENA.yml'
   workflow_dispatch:
     inputs:
       preview:
@@ -28,4 +31,4 @@ jobs:
       WRT_REPO: https://github.com/VIKINGYFY/immortalwrt.git
       WRT_BRANCH: main
       WRT_SOURCE: VIKINGYFY/immortalwrt
-      WRT_TEST: ${{ inputs.preview }}
+      WRT_TEST: ${{ github.event_name != 'workflow_dispatch' || inputs.preview }}
