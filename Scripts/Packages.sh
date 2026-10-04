@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2026 VIKINGYFY
 
+set -eo pipefail
+
 #安装和更新软件包
 UPDATE_PACKAGE() {
 	local PKG_NAME=$1
@@ -32,7 +34,12 @@ UPDATE_PACKAGE() {
 	done
 
 	# 克隆 GitHub 仓库
-	git clone --depth=1 --single-branch --branch $PKG_BRANCH "https://github.com/$PKG_REPO.git" $REPO_PATH
+	local PKG_REVISION=$(awk -F '\t' -v repo="$PKG_REPO" '$1=="package" && $2==repo {print $4}' "$GITHUB_WORKSPACE/build.lock.tsv")
+	[[ "$PKG_REVISION" =~ ^[0-9a-f]{40}$ ]] || { echo "Missing package lock: $PKG_REPO" >&2; return 1; }
+	git init "$REPO_PATH"
+	git -C "$REPO_PATH" remote add origin "https://github.com/$PKG_REPO.git"
+	git -C "$REPO_PATH" fetch --depth=1 origin "$PKG_REVISION"
+	git -C "$REPO_PATH" checkout --detach FETCH_HEAD
 
 	# 处理克隆的仓库
 	if [[ "$PKG_SPECIAL" == "pkg" ]]; then
@@ -60,6 +67,7 @@ UPDATE_PACKAGE "nikki" "nikkinikki-org/OpenWrt-nikki" "main"
 UPDATE_PACKAGE "openclash" "vernesong/OpenClash" "dev" "pkg"
 UPDATE_PACKAGE "passwall" "Openwrt-Passwall/openwrt-passwall" "main" "pkg"
 UPDATE_PACKAGE "passwall2" "Openwrt-Passwall/openwrt-passwall2" "main" "pkg"
+UPDATE_PACKAGE "lucky" "gdy666/luci-app-lucky" "main"
 
 UPDATE_PACKAGE "diskmanager" "4IceG/luci-app-mini-diskmanager" "main"
 UPDATE_PACKAGE "easytier" "EasyTier/luci-app-easytier" "main"

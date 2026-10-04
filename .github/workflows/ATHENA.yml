@@ -1,0 +1,31 @@
+name: Athena VIKINGYFY
+run-name: Athena B - ${{ inputs.preview && 'defconfig preview' || 'firmware build' }}
+on:
+  workflow_dispatch:
+    inputs:
+      preview:
+        description: Only validate configuration; do not compile or release firmware
+        type: boolean
+        default: true
+        required: true
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: athena-b-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  athena:
+    uses: ./.github/workflows/WRT-CORE.yml
+    with:
+      WRT_CONFIG: IPQ60XX-WIFI-YES
+      WRT_THEME: aurora
+      WRT_NAME: OWRT
+      WRT_SSID: OWRT
+      WRT_WORD: '12345678'
+      WRT_IP: 192.168.10.1
+      WRT_PW: 无
+      WRT_REPO: https://github.com/VIKINGYFY/immortalwrt.git
+      WRT_BRANCH: main
+      WRT_SOURCE: VIKINGYFY/immortalwrt
+      WRT_TEST: ${{ inputs.preview }}

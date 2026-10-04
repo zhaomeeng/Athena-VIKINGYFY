@@ -117,7 +117,11 @@ jobs:
       - name: Clone Code
         id: clone-code
         run: |
-          git clone --depth=1 --single-branch --branch $WRT_BRANCH $WRT_REPO ./wrt/
+          WRT_REVISION=$(awk -F '\t' '$1=="source" {print $4}' build.lock.tsv)
+          git init ./wrt/
+          git -C ./wrt/ remote add origin "$WRT_REPO"
+          git -C ./wrt/ fetch --depth=1 origin "$WRT_REVISION"
+          git -C ./wrt/ checkout --detach FETCH_HEAD
 
           cd ./wrt/
           WRT_HASH=$(git rev-parse HEAD)
@@ -157,6 +161,11 @@ jobs:
           echo "1" > ./wrt/tmp/.build
           echo "restored build cache: ${{steps.cache-restore.outputs.cache-matched-key}}"
 
+      - name: Prepare Athena locked sources and service defaults
+        run: |
+          cd ./wrt/
+          bash "$GITHUB_WORKSPACE/Scripts/Athena-prepare.sh"
+
       - name: Update Feeds
         run: |
           cd ./wrt/
@@ -183,7 +192,15 @@ jobs:
 
           $GITHUB_WORKSPACE/Scripts/Settings.sh
 
-          make defconfig -j$(nproc) && make clean -j$(nproc)
+          bash "$GITHUB_WORKSPACE/Scripts/Athena-config.sh"
+
+      - name: Save configuration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: athena-b-config-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: warn
 
       - name: Download Packages
         if: ${{ !inputs.WRT_TEST }}
@@ -222,57 +239,33 @@ jobs:
           echo "======================="
 
       - name: Package Firmware
+        if: ${{ !inputs.WRT_TEST }}
         run: |
-          cd ./wrt/ && mkdir ./upload/
+          cd ./wrt/
+          bash "$GITHUB_WORKSPACE/Scripts/Athena-package.sh"
 
-          cp -f ./.config ./upload/Config-"$WRT_CONFIG"-"$WRT_INFO"-"$WRT_BRANCH"-"$WRT_DATE".txt
-
-          if [[ "$WRT_TEST" != 'true' ]]; then
-            echo "WRT_KVER=$(find ./bin/targets/ -type f -name "*.manifest" -exec grep -oP '^kernel - \K[\d\.]+' {} \;)" >> $GITHUB_ENV
-            echo "WRT_LIST=$(find ./bin/targets/ -type f -name "*.manifest" -exec grep -oP '^luci-(app|theme)[^ ]*' {} \; | tr '\n' ' ')" >> $GITHUB_ENV
-            echo "WRT_WIFI=$(printf '%s' "$WRT_CONFIG" | grep -oE 'WIFI-(YES|NO)$' || true)" >> $GITHUB_ENV
-
-            find ./bin/targets/ -iregex ".*\(buildinfo\|json\|sha256sums\|packages\)$" -exec rm -rf {} +
-
-            for FILE in $(find ./bin/targets/ -type f -iname "*$WRT_TARGET*") ; do
-              EXT=$(basename $FILE | cut -d '.' -f 2-)
-              NAME=$(basename $FILE | cut -d '.' -f 1 | grep -io "\($WRT_TARGET\).*")
-              NEW_FILE="$NAME"-"$WRT_INFO"-"$WRT_BRANCH"-"$WRT_WIFI"-"$WRT_DATE"."$EXT"
-              mv -f $FILE ./upload/$NEW_FILE
-            done
-
-            find ./bin/targets/ -type f -exec mv -f {} ./upload/ \;
-
-            make clean -j$(nproc)
-          fi
+      - name: Save firmware artifact
+        if: ${{ !inputs.WRT_TEST && success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: athena-b-firmware-${{ github.run_id }}
+          path: wrt/upload/
+          if-no-files-found: error
 
       - name: Release Firmware
-        uses: softprops/action-gh-release@master
+        if: ${{ !inputs.WRT_TEST && success() }}
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{env.WRT_CONFIG}}-${{env.WRT_INFO}}-${{env.WRT_BRANCH}}-${{env.WRT_DATE}}
-          files: ./wrt/upload/*.*
+          tag_name: athena-b-${{ github.run_id }}
+          files: ./wrt/upload/*
           body: |
-            这是个平台固件包，内含多个设备！
-            请注意选择你需要的设备固件！
-            不要问，刷就完事了！
-
-            全系带开源硬件加速，别问了！
-
-            源码：${{env.WRT_REPO}}
-            分支：${{env.WRT_BRANCH}}
-            提交：${{env.WRT_HASH}}
-
-            配置：${{env.WRT_CONFIG}}
-            平台：${{env.WRT_TARGET}}
-
-            登录地址：${{env.WRT_IP}}
-            登录密码：${{env.WRT_PW}}
-
-            WIFI名称：${{env.WRT_SSID}}
-            WIFI密码：${{env.WRT_WORD}}
-
-            内核版本：${{env.WRT_KVER}}
-            插件列表：${{env.WRT_LIST}}
+            京东云雅典娜 RE-CS-02 / B版。云端编译产物，设备运行验证待完成。
+            框架提交：${{ github.sha }}
+            源码：${{ env.WRT_REPO }}
+            源码提交：${{ env.WRT_HASH }}
+            作者 IPQ60XX-WIFI-YES 基线的受保护配置预检通过。
+            首次启动 OpenClash、PassWall2、Docker 均关闭；先完成有线与 80/160MHz 测试。
+            使用 SHA256SUMS 核对下载文件。升级操作与服务切换见 docs/OPERATIONS.md。
 
   cache-rollover:
     name: Roll cache generations
