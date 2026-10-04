@@ -4,7 +4,7 @@
 
 1. 在 GitHub Actions 打开 `Athena VIKINGYFY`，勾选 preview 运行预检。
 2. 确认运行成功，下载 `athena-b-config-*`；检查 `preflight.txt`、`protected.diff`（应为空）、`application.diff`、`final.config`。
-3. 使用同一仓库提交，取消 preview 运行正式编译。正式编译会再次执行同样的预检，失败即停止。
+3. 保持同一套已通过预检的源锁与配置，取消 preview 运行正式编译。正式编译会再次执行同样的预检，失败即停止。每个产物记录实际框架提交；配置或锁文件更新后必须重新预检。
 4. 成功后从 `athena-b-*` Release 下载雅典娜 Factory/Sysupgrade 和 SHA256SUMS，以及配置、manifest 和 packages。
 5. 要重建相同源配置，检出该 Release 记录的框架提交，并保持 `build.lock.tsv`。升级上游时先更新自己的框架/源码/feeds/插件锁，重新预检，不能直接切换到其他作者源码。
 
