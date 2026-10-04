@@ -346,12 +346,12 @@ Aurora不要重复增加，因为VIKINGYFY当前配置已经包含Aurora Theme�
 
 正常状态：
 
-OpenClash运行  
+OpenClash运行
 PassWall2停止
 
 需要测试或OpenClash发生故障时：
 
-OpenClash停止  
+OpenClash停止
 PassWall2运行
 
 不要同时让两套系统接管：
@@ -503,8 +503,8 @@ A版和B版不要求：
 
 首先保持：
 
-**OpenClash关闭  
-PassWall2关闭  
+**OpenClash关闭
+PassWall2关闭
 Docker关闭**
 
 测试路由器纯净状态。
