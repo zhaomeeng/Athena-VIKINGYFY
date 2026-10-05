@@ -76,7 +76,9 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: Checkout Projects
-        uses: actions/checkout@main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Reclaim hosted runner disk space
         run: bash Scripts/Athena-runner-space.sh
@@ -131,17 +133,17 @@ jobs:
 
       - name: Select preceding or resumable checkpoint
         id: checkpoint
-        if: ${{ inputs.WRT_CHECKPOINT_STAGE != '' }}
+        if: ${{ inputs.WRT_CHECKPOINT_STAGE != '' || inputs.WRT_STAGE == 'toolchain' }}
         env:
           PRECEDING_STAGE: ${{ inputs.WRT_CHECKPOINT_STAGE }}
         run: |
           stage="$PRECEDING_STAGE"
-          if [[ "$WRT_STAGE" == language ]]; then
-            name="athena-b-checkpoint-language-$GITHUB_RUN_ID"
+          if [[ "$WRT_STAGE" == toolchain ]]; then
+            name="athena-b-checkpoint-toolchain-$GITHUB_RUN_ID"
             available=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts")
             if jq -e --arg name "$name" '.artifacts[] | select(.name == $name and .expired == false)' \
                 <<< "$available" > /dev/null; then
-              stage=language
+              stage=toolchain
             fi
           fi
           echo "stage=$stage" >> "$GITHUB_OUTPUT"
@@ -255,7 +257,7 @@ jobs:
 
       - name: Create build checkpoint
         id: checkpoint-create
-        if: ${{ !cancelled() && inputs.WRT_STAGE != 'firmware' && (success() || (inputs.WRT_STAGE == 'language' && steps.compile-stage.outcome == 'failure')) }}
+        if: ${{ !cancelled() && inputs.WRT_STAGE == 'toolchain' && (success() || steps.compile-stage.outcome == 'failure') }}
         run: |
           cd ./wrt/
           bash "$GITHUB_WORKSPACE/Scripts/Athena-checkpoint.sh" save "$WRT_STAGE"
@@ -317,5 +319,5 @@ jobs:
             源码：${{ env.WRT_REPO }}
             源码提交：${{ env.WRT_HASH }}
             作者 IPQ60XX-WIFI-YES 基线的受保护配置预检通过。
-            首次启动 OpenClash、PassWall2、Docker 均关闭；先完成有线与 80/160MHz 测试。
+            固件不包含 PassWall 1/2；首次启动 OpenClash、Docker 均关闭，先完成有线与 80/160MHz 测试。
             使用 SHA256SUMS 核对下载文件。升级操作与服务切换见 docs/OPERATIONS.md。

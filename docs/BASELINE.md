@@ -10,7 +10,7 @@
 
 ## 应用差异
 
-删除 HomeProxy、GecoosAC、NATMapT 及后两者的运行包；新增 OpenClash、PassWall2、Lucky、TTYD、Docker/dockerd、Dockerman。PassWall2 选择 nftables 透明代理及 Xray/Sing-box 双核心，具体依赖由当前包的 Kconfig 解析。
+删除 HomeProxy、GecoosAC、NATMapT 及后两者的运行包；新增 OpenClash、Lucky、TTYD、Docker/dockerd、Dockerman。按用户最新要求移除 PassWall 1/2 及专用核心，真实配置检查排除 Rust host 消费包。
 
 保留作者 FullCone NAT Sonic、UPnP、WOL Ultra、Mini Disk Manager、Samba4、Partexp、AutoReboot、Firewall、Package Manager、Aurora Theme/Config。
 
@@ -24,7 +24,7 @@
 - 上游初始化仍使用其公开环境安装脚本；提交锁定保证源配置复现，不承诺不同构建时间产生逐字节一致的镜像。
 - 不调用原先删除 packages/buildinfo 后打包的方法。保存最终配置、作者基线、应用差异、受保护配置差异、锁文件、实际 feed 提交、源码变更摘要、Factory/Sysupgrade、manifest、packages、buildinfo、profiles.json、SHA256SUMS。
 - 预检运行只上传配置证据，不生成固件 Release。
-- 首次启动关闭两个代理和 dockerd；OpenClash 核心来自 MetaCubeX/mihomo v1.19.32，经 SHA-256 核验。
+- 首次启动关闭 OpenClash 和 dockerd；OpenClash 核心来自 MetaCubeX/mihomo v1.19.32，经 SHA-256 核验。
 - 首轮编译因 runner 磁盘耗尽失败后，只调整构建机磁盘策略：Ubuntu 24.04、预装 SDK/cache 清理、1G ccache 上限、make 原生 AUTOREMOVE 和空间监控。源码与应用配置不变，最终 `.config` 不写入 AUTOREMOVE；详见 BUILD_ISSUES.md。
 - 第二轮超过 GitHub 单任务六小时上限后，构建拆为工具链/内核、Rust 主机编译器、固件三个串行任务。完成阶段以保留权限、软链接和时间的完整源树检查点传递，不再使用仅在整轮成功后保存的 staging_dir 缓存。每段编译限时五小时；配置、源码锁和作者底层实现保持不变。预检先实际验证两次跨任务恢复。
 

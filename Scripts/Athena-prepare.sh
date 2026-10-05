@@ -15,9 +15,7 @@ cat > files/etc/uci-defaults/99-athena-services <<'EOF'
 # First boot is reserved for the wired / 80 MHz / 160 MHz baseline tests.
 uci -q set openclash.config.enable='0'
 uci -q commit openclash
-uci -q set passwall2.@global[0].enabled='0'
-uci -q commit passwall2
-for service in openclash passwall2 dockerd; do
+for service in openclash dockerd; do
     [ ! -x "/etc/init.d/$service" ] || "/etc/init.d/$service" disable
 done
 exit 0

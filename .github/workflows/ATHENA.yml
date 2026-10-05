@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       preview:
-        description: Validate configuration and both checkpoint restores; do not compile firmware
+        description: Validate configuration and checkpoint restore; do not compile firmware
         type: boolean
         default: true
         required: true
@@ -33,7 +33,7 @@ jobs:
       WRT_SOURCE: VIKINGYFY/immortalwrt
       WRT_STAGE: toolchain
       WRT_TEST: ${{ github.event_name != 'workflow_dispatch' || inputs.preview }}
-  language:
+  athena:
     needs: toolchain
     uses: ./.github/workflows/WRT-CORE.yml
     with:
@@ -47,23 +47,6 @@ jobs:
       WRT_REPO: https://github.com/VIKINGYFY/immortalwrt.git
       WRT_BRANCH: main
       WRT_SOURCE: VIKINGYFY/immortalwrt
-      WRT_STAGE: language
-      WRT_CHECKPOINT_STAGE: toolchain
-      WRT_TEST: ${{ github.event_name != 'workflow_dispatch' || inputs.preview }}
-  athena:
-    needs: language
-    uses: ./.github/workflows/WRT-CORE.yml
-    with:
-      WRT_CONFIG: IPQ60XX-WIFI-YES
-      WRT_THEME: aurora
-      WRT_NAME: OWRT
-      WRT_SSID: OWRT
-      WRT_WORD: '12345678'
-      WRT_IP: 192.168.10.1
-      WRT_PW: 无
-      WRT_REPO: https://github.com/VIKINGYFY/immortalwrt.git
-      WRT_BRANCH: main
-      WRT_SOURCE: VIKINGYFY/immortalwrt
       WRT_STAGE: firmware
-      WRT_CHECKPOINT_STAGE: language
+      WRT_CHECKPOINT_STAGE: toolchain
       WRT_TEST: ${{ github.event_name != 'workflow_dispatch' || inputs.preview }}

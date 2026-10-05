@@ -7,7 +7,7 @@ rm -f -- "$out/compile-exit.txt"
 export CCACHE_MAXSIZE=1G
 stage=${WRT_STAGE:-firmware}
 case "$stage" in
-    toolchain|language|firmware) ;;
+    toolchain|firmware) ;;
     *) echo 'Unknown build stage.' >&2; exit 1 ;;
 esac
 
@@ -28,20 +28,18 @@ fi
 
 # The pinned source implements AUTOREMOVE in include/package.mk and retains .pkgdir/stamps.
 # Pass it to make only: do not change the resolved firmware .config.
-# Stop at five hours to leave time for diagnostics rather than hitting the runner's six-hour limit.
+# Stop at four hours to leave time for diagnostics rather than hitting the runner's six-hour limit.
 # Each completed stage is transferred to the next job with the source tree and original stamps intact.
 export WRT_STAGE="$stage"
 # Variables are expanded by the child Bash, after timeout has established its process group.
 # shellcheck disable=SC2016
-setsid timeout --signal=TERM --kill-after=60s 300m bash -c '
+setsid timeout --signal=TERM --kill-after=60s 240m bash -c '
     build_target() {
         make -j"$(nproc)" CONFIG_AUTOREMOVE=y "$@" || make -j1 V=s CONFIG_AUTOREMOVE=y "$@"
     }
     case "$WRT_STAGE" in
         toolchain)
             build_target tools/install && build_target toolchain/install && build_target target/compile ;;
-        language)
-            build_target package/feeds/packages/rust/host/compile ;;
         firmware)
             build_target ;;
     esac

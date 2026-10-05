@@ -3,8 +3,8 @@ set -euo pipefail
 task_root="${GITHUB_WORKSPACE:?}"
 out="$task_root/artifacts"
 mode=${1:?save or restore}
-stage=${2:?toolchain or language}
-[[ "$stage" == toolchain || "$stage" == language ]]
+stage=${2:?toolchain}
+[[ "$stage" == toolchain ]]
 [[ "$(pwd -P)" == /mnt/build_wrt ]] || { echo 'Checkpoint requires /mnt/build_wrt.' >&2; exit 1; }
 
 # Hash build inputs, not status documents or the runner's temporary build policy.
@@ -26,9 +26,6 @@ case "$mode" in
             case "$status" in
                 0) ;;
                 124)
-                    [[ "$stage" == language ]] || {
-                        echo 'Only the unfinished Rust host stage can be checkpointed after its time limit.' >&2; exit 1;
-                    }
                     complete=false ;;
                 *) echo 'Do not checkpoint a compiler failure.' >&2; exit 1 ;;
             esac
@@ -74,7 +71,7 @@ case "$mode" in
         [[ "$(cat "$src/stage.txt")" == "$stage" ]]
         case "$(cat "$src/complete.txt")" in
             true) ;;
-            false) [[ "$stage" == language && "${WRT_STAGE:?}" == language ]] ;;
+            false) [[ "$stage" == "${WRT_STAGE:?}" ]] ;;
             *) echo 'Invalid checkpoint completion state.' >&2; exit 1 ;;
         esac
         [[ "$(cat "$src/preview.txt")" == "$WRT_TEST" ]]
@@ -112,7 +109,7 @@ case "$mode" in
         done < "$src/build.env"
         # Verify executable modes and package symlinks survived the archive.
         [[ -x files/etc/uci-defaults/99-athena-services && -x files/etc/openclash/core/clash_meta ]]
-        [[ -L package/feeds/packages/rust && -f package/feeds/packages/rust/Makefile ]]
+        [[ -L package/feeds/luci/luci-app-firewall && -f package/feeds/luci/luci-app-firewall/Makefile ]]
         printf 'PASS: %s checkpoint restored with matching source, inputs, config, modes and symlinks.\n' \
             "$stage" | tee "$out/checkpoint-restore-${WRT_STAGE:?}.txt"
         # Remove only the verified archive to reclaim space before compilation.

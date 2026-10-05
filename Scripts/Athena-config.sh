@@ -36,8 +36,8 @@ diff -u "$out/baseline.config" "$out/final.config" > "$out/application.diff" || 
 required=(luci luci-app-firewall luci-app-package-manager luci-theme-aurora luci-app-aurora-config
     luci-app-fullconenat-sonic fullconenat-sonic luci-app-autoreboot luci-app-mini-diskmanager
     luci-app-samba4 luci-app-partexp luci-app-upnp luci-app-wolultra luci-app-openclash
-    luci-app-passwall2 luci-app-lucky luci-app-ttyd docker dockerd containerd runc
-    xray-core sing-box dnsmasq-full geoview tcping kmod-qca-nss-drv kmod-qca-nss-ecm
+    luci-app-lucky luci-app-ttyd docker dockerd containerd runc
+    dnsmasq-full kmod-qca-nss-drv kmod-qca-nss-ecm
     kmod-ath11k kmod-ath11k-pci kmod-usb-storage mmc-utils)
 for name in "${required[@]}"; do
     grep -qx "CONFIG_PACKAGE_$name=y" .config || { echo "Required package missing: $name" >&2; exit 1; }
@@ -45,11 +45,38 @@ done
 grep -qx 'CONFIG_TARGET_DEVICE_qualcommax_ipq60xx_DEVICE_jdcloud_re-cs-02=y' .config
 grep -Eq '^CONFIG_PACKAGE_ath11k-firmware-qcn9074-ddwrt=[ym]$' .config
 grep -A15 '^define Device/jdcloud_re-cs-02$' target/linux/qualcommax/image/ipq60xx.mk | grep -q 'ath11k-firmware-qcn9074-ddwrt'
-for name in homeproxy gecoosac natmapt passwall ssr-plus nikki momo adguardhome mosdns smartdns sqm easytier oaf vlmcsd store istorex attendedsysupgrade; do
+for name in homeproxy gecoosac natmapt passwall passwall2 ssr-plus nikki momo adguardhome mosdns smartdns sqm easytier oaf vlmcsd store istorex attendedsysupgrade; do
     if grep -Eq "^CONFIG_PACKAGE_luci-app-$name=[ym]$" .config; then
         echo "Excluded application selected: $name" >&2; exit 1
     fi
 done
+for name in xray-core sing-box rust shadowsocks-rust-sslocal shadowsocks-rust-ssserver \
+    shadowsocks-rust-ssmanager shadowsocks-rust-ssservice shadowsocks-rust-ssurl \
+    shadowsocksr-libev-ssr-local simple-obfs-client v2ray-plugin; do
+    if grep -Eq "^CONFIG_PACKAGE_$name=[ym]$" .config; then
+        echo "Excluded proxy backend selected: $name" >&2; exit 1
+    fi
+done
+awk '
+    FNR==NR {
+        if ($0 ~ /^CONFIG_PACKAGE_.*=[ym]$/) {
+            name=$0; sub(/^CONFIG_PACKAGE_/, "", name); sub(/=[ym]$/, "", name); selected[name]=1
+        }
+        next
+    }
+    function flush( i) {
+        if (uses_rust) for (i=1; i<=count; i++)
+            if (selected[names[i]]) print source "\t" names[i]
+    }
+    /^Source-Makefile:/ {flush(); source=$2; count=0; uses_rust=0}
+    /^Package:/ {names[++count]=$2}
+    /rust\/host/ {uses_rust=1}
+    END {flush()}
+' .config tmp/.packageinfo > "$out/selected-rust-consumers.txt"
+[[ ! -s "$out/selected-rust-consumers.txt" ]] || {
+    cat "$out/selected-rust-consumers.txt"; echo 'Selected package still depends on Rust host.' >&2; exit 1;
+}
+gzip -c tmp/.packageinfo > "$out/packageinfo.gz"
 printf 'PASS: protected baseline unchanged; required applications selected; exclusions satisfied.\n' | tee "$out/preflight.txt"
 
 # Preserve the exact Git revisions for feed reproduction and diagnostics.

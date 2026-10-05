@@ -19,13 +19,22 @@ done
 unsquashfs_bin="$PWD/staging_dir/host/bin/unsquashfs4"
 [[ -x "$unsquashfs_bin" ]]
 "$unsquashfs_bin" -o 6291456 -ll "$factory_image" > "$out/athena-rootfs.txt"
-for path in 'lib/firmware/ath11k/QCN9074/hw1.0/amss.bin' 'lib/firmware/IPQ6018/amss.bin' 'etc/openclash/core/clash_meta' 'etc/init.d/passwall2' 'usr/bin/dockerd' 'usr/bin/docker' 'etc/uci-defaults/99-athena-services'; do
+for path in 'lib/firmware/ath11k/QCN9074/hw1.0/amss.bin' 'lib/firmware/IPQ6018/amss.bin' 'etc/openclash/core/clash_meta' 'etc/init.d/openclash' 'usr/bin/dockerd' 'usr/bin/docker' 'etc/uci-defaults/99-athena-services'; do
     grep -Fq "$path" "$out/athena-rootfs.txt" || { echo "Missing Athena rootfs path: $path" >&2; exit 1; }
 done
+if grep -Eq 'squashfs-root/etc/(init.d/passwall2?|config/passwall2?)([[:space:]]|$)' "$out/athena-rootfs.txt"; then
+    echo 'Excluded PassWall files found in Athena rootfs.' >&2; exit 1
+fi
 cp "$out/athena-rootfs.txt" upload/
 for database in lib/apk/db/installed usr/lib/opkg/status; do
     if grep -Fq "squashfs-root/$database" "$out/athena-rootfs.txt"; then
         "$unsquashfs_bin" -o 6291456 -cat "$factory_image" "$database" > upload/athena-packages.db
+    fi
+done
+[[ -s upload/athena-packages.db ]]
+for name in luci-app-passwall luci-app-passwall2 xray-core sing-box shadowsocks-rust-sslocal; do
+    if grep -Eq "^(P:$name|Package: $name)$" upload/athena-packages.db; then
+        echo "Excluded image package: $name" >&2; exit 1
     fi
 done
 find "$target" -maxdepth 1 -type f \( -name '*.manifest' -o -name '*buildinfo' -o -name 'profiles.json' \) -exec cp {} upload/ \;
@@ -35,4 +44,5 @@ find "$target" -name '*jdcloud_re-cs-02*manifest' -exec cat {} \; > "$out/athena
 if [[ -s "$out/athena.manifest" ]]; then
     cp "$out/athena.manifest" upload/
 fi
-(cd upload && find . -maxdepth 1 -type f ! -name SHA256SUMS -printf '%P\0' | sort -z | xargs -0 sha256sum > SHA256SUMS)
+(cd upload && find . -maxdepth 1 -type f ! -name SHA256SUMS -printf '%P\0' | sort -z | xargs -0 sha256sum > "$out/release.SHA256SUMS")
+mv "$out/release.SHA256SUMS" upload/SHA256SUMS
