@@ -49,6 +49,10 @@ Restore Build Cache 没有命中；超时后 Save Build Cache 被跳过，本轮
 - 使用原生 `tools/install`、`toolchain/install`、`target/compile`、`package/feeds/packages/rust/host/compile` 目标；不改 Rust 包、NSS、内核或应用选择。
 - 传递完整工作树，保持 `/mnt/build_wrt` 路径和文件时间，避免只恢复 staging_dir 而丢失 build_dir 内的 .prepared/.configured/.built stamps。已锁源码的 host-build.mk 在 AUTOREMOVE 下仍保留零字节 stamps，原生 host-compile 已完成的目录内容会清理。
 - 检查点用 tar.zst 保存软链接、权限和隐藏文件，校验源锁、构建输入、最终配置、平台、同一次 Run 以及 SHA-256；不传递根目录签名材料，不将凭证配置收入检查点。中间 artifact 保留三天，后续失败可在同一次 Run 重跑失败任务。
-- 默认 preview 先实际运行源树打包和两次跨任务恢复，不编译；通过后再启动正式构建。静态 Bash 语法和 actionlint 已通过；实际恢复结果待预检。
+- 默认 preview 先实际运行源树打包和两次跨任务恢复，不编译；通过后再启动正式构建。Bash 语法、ShellCheck 和 actionlint 均通过。
 - Rust 本段若仍触及五小时软限制，保存未完成检查点，重跑失败任务可继续其 host-compile。只接受限时退出码 124 且编译前后配置一致；最终固件阶段只接受完成标志为 true 的检查点。该限时续编路径尚待真实构建验证。
 - ShellCheck v0.11.0 检查新增脚本与工作流内联 Bash：修正原工作流路径引用的引号，标明子 Bash 展开和 trap 回调两项静态分析例外；完整检查通过。恢复证据时另存当前 runner 的空间记录，避免被上一段证据覆盖。这些修正不改变源码、版本锁或最终固件配置。
+
+分阶段预检 Run `37293737154` 基于 `5512721`，在补充 Rust 限时续编机制后主动取消。替代预检 [Run 37294364565](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37294364565) 基于 `8722455`，2026-10-05 18:06:01 至 18:31:47（Asia/Shanghai），三任务全部成功，Compile build stage/Release Firmware 均 skipped。两次恢复均通过源码、输入、配置、执行权限和软链接校验；配置哈希仍为 `b381caf9ddddc94b99e659777e2a48a67d9c7562a3350b234647a8366a16fb5f`，protected.diff 为空。配置证据、诊断及完整日志已下载；实际编译树及限时恢复尚待正式运行验证。
+
+第三次正式 [Run 37297257083](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37297257083) 基于 `621a8df`，2026-10-05 18:32:43（Asia/Shanghai）启动。该提交相对预检仅修改工作流引用、诊断保留和静态分析注释；源码锁、配置及源树准备脚本没有变化。当前在首个任务的环境准备阶段，结果待完成。
