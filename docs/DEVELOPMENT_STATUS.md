@@ -14,7 +14,9 @@
 
 本次正式运行的 Custom Settings/配置预检和 Download Packages 均成功，已下载配置证据并确认 preflight PASS、protected.diff 为 0 字节。只有配置 artifact；没有固件 artifact 或 Release。runner 异常退出后完整 job 日志不可获取（`log not found`），不推断具体软件包编译错误。
 
-用户已授权继续。已补充临时 runner 预装 SDK/cache 清理、原生 AUTOREMOVE、1G ccache 上限和磁盘监控/诊断，锁定 Ubuntu 24.04；源码/锁/应用配置与底层实现保持原值。Bash 语法、actionlint、差异检查通过，准备第二次正式构建。
+用户已授权继续。已补充临时 runner 预装 SDK/cache 清理、原生 AUTOREMOVE、1G ccache 上限和磁盘监控/诊断，锁定 Ubuntu 24.04；源码/锁/应用配置与底层实现保持原值。Bash 语法、actionlint、差异检查通过。
+
+第二次正式构建已启动：[Run 37253202265](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37253202265)，框架提交 `8df827caaa85a35a2b5dc86b61a356923110c5be`，创建时间 2026-10-05 09:53:36（Asia/Shanghai）。最终磁盘清理效果和编译结果待实际运行证据，尚无成功固件。
 
 下一步：触发重编，核对实际回收空间、配置预检与编译结果。B 版成功后实施 A 版。
 
