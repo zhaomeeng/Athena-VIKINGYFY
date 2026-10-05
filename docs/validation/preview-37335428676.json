@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-06",
+  "run_url": "https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37335428676",
+  "framework_commit": "42b0e3c2c942b152bdd3e289bd8db8a025280994",
+  "source_commit": "0fb9b10cb9df51fb076470e1dd93d1c30dd89d83",
+  "run_conclusion": "success",
+  "stage_conclusions": {"toolchain": "success", "firmware": "success"},
+  "preflight": "PASS",
+  "protected_diff_bytes": 0,
+  "selected_rust_consumers_bytes": 0,
+  "excluded_packages": ["luci-app-passwall", "luci-app-passwall2", "xray-core", "sing-box", "shadowsocks-rust programs"],
+  "ruby_yjit_enabled": false,
+  "final_config_sha256": "a3dd345a4edd57d7cf0f274c282b787ccdce5f29aa95a31615a9e8396d45ccd3",
+  "checkpoint_restore": "PASS: matching source, inputs, config, modes and symlinks",
+  "firmware_job_config_matches_toolchain_job": true,
+  "compile_and_release": "skipped in preview",
+  "compiled_tree_reuse": "not yet verified; preview transfers prepared source only",
+  "device_validation": "not performed",
+  "next_formal_run_url": "https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37338343637",
+  "next_formal_framework_commit": "1ff78b5bd2d4db7bf775c4027c221b57be17c811",
+  "next_formal_delta": "Only Rust dependency checker allows hyphens in condition names; source/config inputs unchanged. Current checker tested against full preview config and package metadata."
+}
