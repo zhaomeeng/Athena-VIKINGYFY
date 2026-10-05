@@ -1,5 +1,9 @@
 # 构建问题与处理记录
 
+## 无 PassWall 首次预检：Ruby YJIT 的额外 Rust 依赖
+
+Run 37331839464 同样在 Rust 消费包检查失败；A 对应 Run 37331824442 下载证据证明 Ruby 默认 YJIT 会引入 Rust host。两版应用层显式关闭 RUBY_ENABLE_YJIT，保留 OpenClash 所需 Ruby/YAML；检查按实际配置解析条件依赖，本地禁用/启用条件回归通过，不改变原生 NSS/无线/设备配置。
+
 ## 2026-10-06 用户变更：公开并移除 PassWall 后重编
 
 用户要求取消含 PassWall 的 A/B 构建，旧 B Run 37297257083 已确认 cancelled。全部本地 Git 历史凭据特征及敏感文件名检查未命中，仓库已公开。应用 overlay 禁用 PassWall 1/2 和专用核心，独立 Rust 任务移除，首启只关闭 OpenClash/Docker；真实预检增加 Rust host 消费包检查，镜像拒绝 PassWall 文件/包。当前工具链/内核、最终固件两段各限四小时；旧配置的预检和检查点不复用。GENERAL、IPQ60XX-WIFI-YES、Handles/Settings 保持原生不变。

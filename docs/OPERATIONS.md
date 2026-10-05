@@ -2,6 +2,8 @@
 
 ## 构建
 
+Ruby/YAML 解释器保留供 OpenClash 使用，仅关闭可选 YJIT，避免该功能继续引入 Rust host。配置预检按实际启用条件核对 Rust 构建依赖，packageinfo.gz 保存完整元数据。
+
 1. 在 GitHub Actions 打开 `Athena VIKINGYFY`，勾选 preview 运行预检。
 2. 确认两个预检任务都成功，下载 `athena-b-config-firmware-*`；检查 `preflight.txt`、`protected.diff`（应为空）、`application.diff`、`final.config`、空的 `selected-rust-consumers.txt` 和 `checkpoint-restore-firmware.txt`。预检仅解析配置并验证源树跨任务恢复，不编译或发布。
 3. 保持同一套已通过预检的源锁与配置，取消 preview 运行正式编译。先完成工具/工具链/内核，再编译其余软件包并打包固件；两个任务串行，每个编译阶段最多四小时，留出运行器准备、检查点恢复和诊断上传时间。PassWall 1/2 及专用核心已移除，不执行独立 Rust 编译。正式编译先执行配置预检，后续任务恢复同一次运行的源树、验证源码/输入/配置哈希及底层保护证据，不重复改写应用配置。每个产物记录实际框架提交；配置或锁文件更新后必须重新预检。
