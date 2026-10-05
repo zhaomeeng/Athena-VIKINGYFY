@@ -50,3 +50,4 @@ Restore Build Cache 没有命中；超时后 Save Build Cache 被跳过，本轮
 - 传递完整工作树，保持 `/mnt/build_wrt` 路径和文件时间，避免只恢复 staging_dir 而丢失 build_dir 内的 .prepared/.configured/.built stamps。已锁源码的 host-build.mk 在 AUTOREMOVE 下仍保留零字节 stamps，原生 host-compile 已完成的目录内容会清理。
 - 检查点用 tar.zst 保存软链接、权限和隐藏文件，校验源锁、构建输入、最终配置、平台、同一次 Run 以及 SHA-256；不传递根目录签名材料，不将凭证配置收入检查点。中间 artifact 保留三天，后续失败可在同一次 Run 重跑失败任务。
 - 默认 preview 先实际运行源树打包和两次跨任务恢复，不编译；通过后再启动正式构建。静态 Bash 语法和 actionlint 已通过；实际恢复结果待预检。
+- Rust 本段若仍触及五小时软限制，保存未完成检查点，重跑失败任务可继续其 host-compile。只接受限时退出码 124 且编译前后配置一致；最终固件阶段只接受完成标志为 true 的检查点。该限时续编路径尚待真实构建验证。

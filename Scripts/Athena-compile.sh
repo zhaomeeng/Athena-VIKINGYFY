@@ -3,6 +3,7 @@ set -euo pipefail
 task_root="${GITHUB_WORKSPACE:?}"
 out="$task_root/artifacts"
 mkdir -p "$out"
+rm -f -- "$out/compile-exit.txt"
 export CCACHE_MAXSIZE=1G
 stage=${WRT_STAGE:-firmware}
 case "$stage" in
@@ -78,4 +79,5 @@ if ! cmp -s "$out/compile-config-before.sha256" "$out/compile-config-after.sha25
     echo 'Resolved firmware configuration changed during compilation.' >&2
     exit 1
 fi
+printf '%s\n' "$build_status" > "$out/compile-exit.txt"
 exit "$build_status"

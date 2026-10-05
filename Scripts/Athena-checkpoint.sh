@@ -20,6 +20,19 @@ input_hash() {
 
 case "$mode" in
     save)
+        complete=true
+        if [[ "$WRT_TEST" != true ]]; then
+            status=$(cat "$out/compile-exit.txt")
+            case "$status" in
+                0) ;;
+                124)
+                    [[ "$stage" == language ]] || {
+                        echo 'Only the unfinished Rust host stage can be checkpointed after its time limit.' >&2; exit 1;
+                    }
+                    complete=false ;;
+                *) echo 'Do not checkpoint a compiler failure.' >&2; exit 1 ;;
+            esac
+        fi
         dest="$task_root/checkpoint-upload"
         mkdir -p "$dest" .athena-evidence
         cp -a "$out/." .athena-evidence/
@@ -27,6 +40,7 @@ case "$mode" in
         sha256sum .config | cut -d' ' -f1 > "$dest/config.sha256"
         git rev-parse HEAD > "$dest/source.txt"
         printf '%s\n' "$stage" > "$dest/stage.txt"
+        printf '%s\n' "$complete" > "$dest/complete.txt"
         printf '%s\n' "$WRT_TEST" > "$dest/preview.txt"
         printf '%s\n' "${GITHUB_RUN_ID:?}" > "$dest/run.txt"
         printf '%s\n' "$(uname -m)" > "$dest/arch.txt"
@@ -58,6 +72,11 @@ case "$mode" in
         src="$task_root/checkpoint-download"
         [[ -z "$(ls -A .)" ]] || { echo 'Restore destination must be empty.' >&2; exit 1; }
         [[ "$(cat "$src/stage.txt")" == "$stage" ]]
+        case "$(cat "$src/complete.txt")" in
+            true) ;;
+            false) [[ "$stage" == language && "${WRT_STAGE:?}" == language ]] ;;
+            *) echo 'Invalid checkpoint completion state.' >&2; exit 1 ;;
+        esac
         [[ "$(cat "$src/preview.txt")" == "$WRT_TEST" ]]
         [[ "$(cat "$src/run.txt")" == "${GITHUB_RUN_ID:?}" ]]
         [[ "$(cat "$src/arch.txt")" == "$(uname -m)" ]]

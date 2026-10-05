@@ -129,9 +129,26 @@ jobs:
           } >> "$GITHUB_ENV"
           echo "cache_prefix=$WRT_CACHE_PREFIX" >> "$GITHUB_OUTPUT"
 
+      - name: Select preceding or resumable checkpoint
+        id: checkpoint
+        if: ${{ inputs.WRT_CHECKPOINT_STAGE != '' }}
+        env:
+          PRECEDING_STAGE: ${{ inputs.WRT_CHECKPOINT_STAGE }}
+        run: |
+          stage="$PRECEDING_STAGE"
+          if [[ "$WRT_STAGE" == language ]]; then
+            name="athena-b-checkpoint-language-$GITHUB_RUN_ID"
+            available=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts")
+            if jq -e --arg name "$name" '.artifacts[] | select(.name == $name and .expired == false)' \
+                <<< "$available" > /dev/null; then
+              stage=language
+            fi
+          fi
+          echo "stage=$stage" >> "$GITHUB_OUTPUT"
+
       - name: Clone Code
         id: clone-code
-        if: ${{ inputs.WRT_CHECKPOINT_STAGE == '' }}
+        if: ${{ steps.checkpoint.outputs.stage == '' }}
         run: |
           WRT_REVISION=$(awk -F '\t' '$1=="source" {print $4}' build.lock.tsv)
           git init ./wrt/
@@ -156,28 +173,28 @@ jobs:
           find ./ -maxdepth 3 -type f -iregex ".*\(txt\|sh\)$" -exec dos2unix {} \; -exec chmod +x {} \;
 
       - name: Download preceding build checkpoint
-        if: ${{ inputs.WRT_CHECKPOINT_STAGE != '' }}
+        if: ${{ steps.checkpoint.outputs.stage != '' }}
         uses: actions/download-artifact@v4
         with:
-          name: athena-b-checkpoint-${{ inputs.WRT_CHECKPOINT_STAGE }}-${{ github.run_id }}
+          name: athena-b-checkpoint-${{ steps.checkpoint.outputs.stage }}-${{ github.run_id }}
           path: checkpoint-download/
 
       - name: Restore and validate build checkpoint
-        if: ${{ inputs.WRT_CHECKPOINT_STAGE != '' }}
+        if: ${{ steps.checkpoint.outputs.stage != '' }}
         env:
-          CHECKPOINT_STAGE: ${{ inputs.WRT_CHECKPOINT_STAGE }}
+          CHECKPOINT_STAGE: ${{ steps.checkpoint.outputs.stage }}
         run: |
           cd ./wrt/
           bash "$GITHUB_WORKSPACE/Scripts/Athena-checkpoint.sh" restore "$CHECKPOINT_STAGE"
 
       - name: Prepare Athena locked sources and service defaults
-        if: ${{ inputs.WRT_CHECKPOINT_STAGE == '' }}
+        if: ${{ steps.checkpoint.outputs.stage == '' }}
         run: |
           cd ./wrt/
           bash "$GITHUB_WORKSPACE/Scripts/Athena-prepare.sh"
 
       - name: Update Feeds
-        if: ${{ inputs.WRT_CHECKPOINT_STAGE == '' }}
+        if: ${{ steps.checkpoint.outputs.stage == '' }}
         run: |
           cd ./wrt/
 
@@ -185,7 +202,7 @@ jobs:
           ./scripts/feeds install -a
 
       - name: Custom Packages
-        if: ${{ inputs.WRT_CHECKPOINT_STAGE == '' }}
+        if: ${{ steps.checkpoint.outputs.stage == '' }}
         run: |
           cd ./wrt/
 
@@ -193,7 +210,7 @@ jobs:
           $GITHUB_WORKSPACE/Scripts/Handles.sh
 
       - name: Custom Settings
-        if: ${{ inputs.WRT_CHECKPOINT_STAGE == '' }}
+        if: ${{ steps.checkpoint.outputs.stage == '' }}
         run: |
           cd ./wrt/
 
@@ -216,7 +233,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Download Packages
-        if: ${{ !inputs.WRT_TEST && inputs.WRT_CHECKPOINT_STAGE == '' }}
+        if: ${{ !inputs.WRT_TEST && steps.checkpoint.outputs.stage == '' }}
         run: |
           cd ./wrt/
 
@@ -229,20 +246,22 @@ jobs:
           } > "$GITHUB_WORKSPACE/artifacts/download-space.txt"
 
       - name: Compile build stage
+        id: compile-stage
         if: ${{ !inputs.WRT_TEST }}
         run: |
           cd ./wrt/
 
           bash "$GITHUB_WORKSPACE/Scripts/Athena-compile.sh"
 
-      - name: Create completed build checkpoint
-        if: ${{ success() && inputs.WRT_STAGE != 'firmware' }}
+      - name: Create build checkpoint
+        id: checkpoint-create
+        if: ${{ !cancelled() && inputs.WRT_STAGE != 'firmware' && (success() || (inputs.WRT_STAGE == 'language' && steps.compile-stage.outcome == 'failure')) }}
         run: |
           cd ./wrt/
           bash "$GITHUB_WORKSPACE/Scripts/Athena-checkpoint.sh" save "$WRT_STAGE"
 
-      - name: Save completed build checkpoint
-        if: ${{ success() && inputs.WRT_STAGE != 'firmware' }}
+      - name: Save build checkpoint
+        if: ${{ !cancelled() && steps.checkpoint-create.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: athena-b-checkpoint-${{ inputs.WRT_STAGE }}-${{ github.run_id }}

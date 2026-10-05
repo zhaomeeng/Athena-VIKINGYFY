@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       preview:
-        description: Only validate configuration; do not compile or release firmware
+        description: Validate configuration and both checkpoint restores; do not compile firmware
         type: boolean
         default: true
         required: true
