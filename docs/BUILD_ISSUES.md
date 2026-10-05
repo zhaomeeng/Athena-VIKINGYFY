@@ -28,3 +28,5 @@ Custom Settings/预检、Save configuration evidence、Download Packages 均成�
 - 上传环境清理前后、依赖下载后、编译前后及每分钟磁盘记录；检查编译前后 `.config` 哈希相同。
 
 版本锁、IPQ60XX-WIFI-YES、GENERAL、应用 overlay 和作者底层脚本均未修改。B 版重编仍先执行完整配置预检。清理效果和最终编译结果以第二次实际运行的 artifact 为准。
+
+第二次 Run 37253202265 实测：72G 根盘清理前可用 14G、清理后 45G、依赖安装后 42G。新配置预检再次通过，protected.diff 为 0 字节，最终配置 SHA-256 与 Run 37241920846 完全相同；完整编译结果仍待完成。
