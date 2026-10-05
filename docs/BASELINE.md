@@ -25,6 +25,7 @@
 - 不调用原先删除 packages/buildinfo 后打包的方法。保存最终配置、作者基线、应用差异、受保护配置差异、锁文件、实际 feed 提交、源码变更摘要、Factory/Sysupgrade、manifest、packages、buildinfo、profiles.json、SHA256SUMS。
 - 预检运行只上传配置证据，不生成固件 Release。
 - 首次启动关闭两个代理和 dockerd；OpenClash 核心来自 MetaCubeX/mihomo v1.19.32，经 SHA-256 核验。
+- 首轮编译因 runner 磁盘耗尽失败后，只调整构建机磁盘策略：Ubuntu 24.04、预装 SDK/cache 清理、1G ccache 上限、make 原生 AUTOREMOVE 和空间监控。源码与应用配置不变，最终 `.config` 不写入 AUTOREMOVE；详见 BUILD_ISSUES.md。
 
 ## 验证边界
 

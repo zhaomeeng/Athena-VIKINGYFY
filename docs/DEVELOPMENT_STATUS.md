@@ -14,7 +14,9 @@
 
 本次正式运行的 Custom Settings/配置预检和 Download Packages 均成功，已下载配置证据并确认 preflight PASS、protected.diff 为 0 字节。只有配置 artifact；没有固件 artifact 或 Release。runner 异常退出后完整 job 日志不可获取（`log not found`），不推断具体软件包编译错误。
 
-下一步：优化 runner 磁盘使用后重新编译，保留已通过预检的源码/配置/锁与底层实现。本次状态检查未修改工作流或重新触发编译。B 版成功后实施 A 版。
+用户已授权继续。已补充临时 runner 预装 SDK/cache 清理、原生 AUTOREMOVE、1G ccache 上限和磁盘监控/诊断，锁定 Ubuntu 24.04；源码/锁/应用配置与底层实现保持原值。Bash 语法、actionlint、差异检查通过，准备第二次正式构建。
+
+下一步：触发重编，核对实际回收空间、配置预检与编译结果。B 版成功后实施 A 版。
 
 阻塞：GitHub runner 磁盘空间耗尽；当前 Windows 没有可用 WSL Linux 发行版，实际 defconfig 与编译使用 GitHub Ubuntu runner。
 
