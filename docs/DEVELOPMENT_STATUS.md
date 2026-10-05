@@ -16,10 +16,10 @@
 
 用户已授权继续。已补充临时 runner 预装 SDK/cache 清理、原生 AUTOREMOVE、1G ccache 上限和磁盘监控/诊断，锁定 Ubuntu 24.04；源码/锁/应用配置与底层实现保持原值。Bash 语法、actionlint、差异检查通过。
 
-第二次正式构建已启动：[Run 37253202265](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37253202265)，框架提交 `8df827caaa85a35a2b5dc86b61a356923110c5be`，创建时间 2026-10-05 09:53:36（Asia/Shanghai）。已下载本次配置 artifact：清理前可用 14G，清理后 45G，安装环境后 42G；配置预检再次 PASS，protected.diff 为 0 字节，final.config SHA-256 与首次正式构建相同。详见 validation/build-space-37253202265.json。正式编译尚未成功结束，尚无定制成功固件。
+第二次正式构建已结束：[Run 37253202265](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37253202265)，框架提交 `8df827caaa85a35a2b5dc86b61a356923110c5be`，2026-10-05 09:53:36 至 15:53:59（Asia/Shanghai）。GitHub 检查注释确认任务超过 6 小时最大执行时间，结论 cancelled。清理前可用 14G、清理后 45G、安装环境后 42G；编译期间记录的最低空间约 20.0 GiB，取消前最后记录约 20.7 GiB，没有触发磁盘保护。配置预检再次 PASS，protected.diff 为 0 字节，final.config SHA-256 与首次正式构建相同。配置及诊断 artifact 和完整运行日志已下载，未产生固件 artifact 或 Release。详见 validation/build-space-37253202265.json 与 BUILD_ISSUES.md。
 
-下一步：检查第二次编译结果，核验 AUTOREMOVE/空间监控与最终镜像交付。B 版成功后实施 A 版。
+下一步：处理完整构建超时与构建缓存恢复，再使用同一源码锁和应用配置重编、核验最终镜像交付。本次仅检查并记录结果，未触发第三次构建。B 版成功后实施 A 版。
 
-已知风险：首轮 runner 磁盘耗尽已实施回收与编译临时文件策略，完整编译是否通过仍待结果。当前 Windows 没有可用 WSL Linux 发行版，实际 defconfig 与编译使用 GitHub Ubuntu runner。
+已知阻塞：当前 runner 从空缓存编译未能在 6 小时任务上限内完成，超时后 Save Build Cache 被跳过；完整编译及镜像内容验证仍未通过。取消时没有生成编译后快照与配置哈希，不能宣称编译前后配置一致检查已完成。当前 Windows 没有可用 WSL Linux 发行版，实际 defconfig 与编译使用 GitHub Ubuntu runner。
 
 决策与需求：见 [BASELINE.md](BASELINE.md)、[REQUIREMENTS.md](REQUIREMENTS.md)、[OPERATIONS.md](OPERATIONS.md)。

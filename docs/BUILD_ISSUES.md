@@ -29,4 +29,14 @@ Custom Settings/预检、Save configuration evidence、Download Packages 均成�
 
 版本锁、IPQ60XX-WIFI-YES、GENERAL、应用 overlay 和作者底层脚本均未修改。B 版重编仍先执行完整配置预检。清理效果和最终编译结果以第二次实际运行的 artifact 为准。
 
-第二次 Run 37253202265 实测：72G 根盘清理前可用 14G、清理后 45G、依赖安装后 42G。新配置预检再次通过，protected.diff 为 0 字节，最终配置 SHA-256 与 Run 37241920846 完全相同；完整编译结果仍待完成。
+第二次 Run 37253202265 实测：72G 根盘清理前可用 14G、清理后 45G、依赖安装后 42G。新配置预检再次通过，protected.diff 为 0 字节，最终配置 SHA-256 与 Run 37241920846 完全相同。
+
+## 第二次正式构建取消：超过 6 小时任务上限
+
+Run `37253202265` 于 2026-10-05 09:53:36 创建、15:53:59 结束（Asia/Shanghai），结论 cancelled。check-run `111584892006` 明确记录：`The job has exceeded the maximum execution time of 6h0m0s`。Compile Firmware 从 10:06:54 执行到 15:53:53，尚在软件包编译阶段；打包、固件 artifact、Release 均被跳过。
+
+已下载完整日志和 `athena-b-diagnostics-37253202265`。347 条空间记录中最低可用 21003656 KiB（约 20.0 GiB），最后一条 15:53:04 为 21655416 KiB（约 20.7 GiB）；没有 disk-stop.txt，磁盘低空间保护未触发。编译日志未见 make Error 或包编译 ERROR，超时前仍有 nftables 编译输出，不能判定固件编译成功。defconfig 阶段另有依赖递归诊断，必需应用/排除项和底层保护预检实际 PASS。
+
+Restore Build Cache 没有命中；超时后 Save Build Cache 被跳过，本轮成果不能据此视为可供下轮恢复的构建缓存。取消时缺少 compile-space-after.txt 和 compile-config-after.sha256，编译前后配置一致检查尚未完成。
+
+下一步处理完整构建时长和可恢复缓存；仍保留原源码锁、应用配置与作者底层基线。本次状态检查未修改构建脚本、工作流或触发第三次构建。
