@@ -18,7 +18,9 @@
 
 第二次正式构建已结束：[Run 37253202265](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37253202265)，框架提交 `8df827caaa85a35a2b5dc86b61a356923110c5be`，2026-10-05 09:53:36 至 15:53:59（Asia/Shanghai）。GitHub 检查注释确认任务超过 6 小时最大执行时间，结论 cancelled。清理前可用 14G、清理后 45G、安装环境后 42G；编译期间记录的最低空间约 20.0 GiB，取消前最后记录约 20.7 GiB，没有触发磁盘保护。配置预检再次 PASS，protected.diff 为 0 字节，final.config SHA-256 与首次正式构建相同。配置及诊断 artifact 和完整运行日志已下载，未产生固件 artifact 或 Release。详见 validation/build-space-37253202265.json 与 BUILD_ISSUES.md。
 
-下一步：处理完整构建超时与构建缓存恢复，再使用同一源码锁和应用配置重编、核验最终镜像交付。本次仅检查并记录结果，未触发第三次构建。B 版成功后实施 A 版。
+用户授权继续后，已将构建改为工具链/内核、Rust 主机编译器、最终固件三个串行任务，使用完整源树检查点和输入/配置校验恢复。各段编译限时五小时；原源码锁、应用 overlay、GENERAL/IPQ60XX-WIFI-YES 与作者底层脚本不变。Bash 语法、actionlint 和差异检查通过；实际两次跨任务恢复待新的 preview 验证。
+
+下一步：运行分阶段预检，确认最终配置不变且检查点两次恢复通过，再启动正式构建、核验最终镜像交付。B 版成功后实施 A 版。
 
 已知阻塞：当前 runner 从空缓存编译未能在 6 小时任务上限内完成，超时后 Save Build Cache 被跳过；完整编译及镜像内容验证仍未通过。取消时没有生成编译后快照与配置哈希，不能宣称编译前后配置一致检查已完成。当前 Windows 没有可用 WSL Linux 发行版，实际 defconfig 与编译使用 GitHub Ubuntu runner。
 

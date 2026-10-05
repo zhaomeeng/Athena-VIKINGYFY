@@ -4,6 +4,11 @@ task_root="${GITHUB_WORKSPACE:?}"
 out="$task_root/artifacts"
 mkdir -p "$out"
 export CCACHE_MAXSIZE=1G
+stage=${WRT_STAGE:-firmware}
+case "$stage" in
+    toolchain|language|firmware) ;;
+    *) echo 'Unknown build stage.' >&2; exit 1 ;;
+esac
 
 snapshot() {
     date -Is
@@ -22,7 +27,22 @@ fi
 
 # The pinned source implements AUTOREMOVE in include/package.mk and retains .pkgdir/stamps.
 # Pass it to make only: do not change the resolved firmware .config.
-setsid bash -c 'make -j"$(nproc)" CONFIG_AUTOREMOVE=y || make -j1 V=s CONFIG_AUTOREMOVE=y' &
+# Stop at five hours to leave time for diagnostics rather than hitting the runner's six-hour limit.
+# Each completed stage is transferred to the next job with the source tree and original stamps intact.
+export WRT_STAGE="$stage"
+setsid timeout --signal=TERM --kill-after=60s 300m bash -c '
+    build_target() {
+        make -j"$(nproc)" CONFIG_AUTOREMOVE=y "$@" || make -j1 V=s CONFIG_AUTOREMOVE=y "$@"
+    }
+    case "$WRT_STAGE" in
+        toolchain)
+            build_target tools/install && build_target toolchain/install && build_target target/compile ;;
+        language)
+            build_target package/feeds/packages/rust/host/compile ;;
+        firmware)
+            build_target ;;
+    esac
+' &
 compiler_pid=$!
 monitor_pid=''
 stop_children() {

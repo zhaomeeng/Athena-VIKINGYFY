@@ -26,6 +26,7 @@
 - 预检运行只上传配置证据，不生成固件 Release。
 - 首次启动关闭两个代理和 dockerd；OpenClash 核心来自 MetaCubeX/mihomo v1.19.32，经 SHA-256 核验。
 - 首轮编译因 runner 磁盘耗尽失败后，只调整构建机磁盘策略：Ubuntu 24.04、预装 SDK/cache 清理、1G ccache 上限、make 原生 AUTOREMOVE 和空间监控。源码与应用配置不变，最终 `.config` 不写入 AUTOREMOVE；详见 BUILD_ISSUES.md。
+- 第二轮超过 GitHub 单任务六小时上限后，构建拆为工具链/内核、Rust 主机编译器、固件三个串行任务。完成阶段以保留权限、软链接和时间的完整源树检查点传递，不再使用仅在整轮成功后保存的 staging_dir 缓存。每段编译限时五小时；配置、源码锁和作者底层实现保持不变。预检先实际验证两次跨任务恢复。
 
 ## 验证边界
 

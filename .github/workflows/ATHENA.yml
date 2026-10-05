@@ -18,7 +18,7 @@ concurrency:
   group: athena-b-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  athena:
+  toolchain:
     uses: ./.github/workflows/WRT-CORE.yml
     with:
       WRT_CONFIG: IPQ60XX-WIFI-YES
@@ -31,4 +31,39 @@ jobs:
       WRT_REPO: https://github.com/VIKINGYFY/immortalwrt.git
       WRT_BRANCH: main
       WRT_SOURCE: VIKINGYFY/immortalwrt
+      WRT_STAGE: toolchain
+      WRT_TEST: ${{ github.event_name != 'workflow_dispatch' || inputs.preview }}
+  language:
+    needs: toolchain
+    uses: ./.github/workflows/WRT-CORE.yml
+    with:
+      WRT_CONFIG: IPQ60XX-WIFI-YES
+      WRT_THEME: aurora
+      WRT_NAME: OWRT
+      WRT_SSID: OWRT
+      WRT_WORD: '12345678'
+      WRT_IP: 192.168.10.1
+      WRT_PW: 无
+      WRT_REPO: https://github.com/VIKINGYFY/immortalwrt.git
+      WRT_BRANCH: main
+      WRT_SOURCE: VIKINGYFY/immortalwrt
+      WRT_STAGE: language
+      WRT_CHECKPOINT_STAGE: toolchain
+      WRT_TEST: ${{ github.event_name != 'workflow_dispatch' || inputs.preview }}
+  athena:
+    needs: language
+    uses: ./.github/workflows/WRT-CORE.yml
+    with:
+      WRT_CONFIG: IPQ60XX-WIFI-YES
+      WRT_THEME: aurora
+      WRT_NAME: OWRT
+      WRT_SSID: OWRT
+      WRT_WORD: '12345678'
+      WRT_IP: 192.168.10.1
+      WRT_PW: 无
+      WRT_REPO: https://github.com/VIKINGYFY/immortalwrt.git
+      WRT_BRANCH: main
+      WRT_SOURCE: VIKINGYFY/immortalwrt
+      WRT_STAGE: firmware
+      WRT_CHECKPOINT_STAGE: language
       WRT_TEST: ${{ github.event_name != 'workflow_dispatch' || inputs.preview }}

@@ -40,3 +40,13 @@ Run `37253202265` 于 2026-10-05 09:53:36 创建、15:53:59 结束（Asia/Shangh
 Restore Build Cache 没有命中；超时后 Save Build Cache 被跳过，本轮成果不能据此视为可供下轮恢复的构建缓存。取消时缺少 compile-space-after.txt 和 compile-config-after.sha256，编译前后配置一致检查尚未完成。
 
 下一步处理完整构建时长和可恢复缓存；仍保留原源码锁、应用配置与作者底层基线。本次状态检查未修改构建脚本、工作流或触发第三次构建。
+
+## 分阶段构建与恢复准备
+
+用户授权继续后核对日志：10:06:54 开始编译，11:30:19 进入内核编译，12:14:20 进入软件包编译；Rust host-compile 从 12:36:00 开始，取消时还有 Rust bootstrap/LLVM 编译进程。GitHub 托管 runner 单任务上限为六小时，增加 timeout-minutes 不能扩展这个上限（[官方限制](https://docs.github.com/en/actions/reference/limits)）。
+
+- 工具/工具链/内核、Rust 主机编译器、最终固件拆成三个串行任务，各段编译最多五小时，留出诊断上传时间。
+- 使用原生 `tools/install`、`toolchain/install`、`target/compile`、`package/feeds/packages/rust/host/compile` 目标；不改 Rust 包、NSS、内核或应用选择。
+- 传递完整工作树，保持 `/mnt/build_wrt` 路径和文件时间，避免只恢复 staging_dir 而丢失 build_dir 内的 .prepared/.configured/.built stamps。已锁源码的 host-build.mk 在 AUTOREMOVE 下仍保留零字节 stamps，原生 host-compile 已完成的目录内容会清理。
+- 检查点用 tar.zst 保存软链接、权限和隐藏文件，校验源锁、构建输入、最终配置、平台、同一次 Run 以及 SHA-256；不传递根目录签名材料，不将凭证配置收入检查点。中间 artifact 保留三天，后续失败可在同一次 Run 重跑失败任务。
+- 默认 preview 先实际运行源树打包和两次跨任务恢复，不编译；通过后再启动正式构建。静态 Bash 语法和 actionlint 已通过；实际恢复结果待预检。

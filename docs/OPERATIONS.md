@@ -3,10 +3,14 @@
 ## 构建
 
 1. 在 GitHub Actions 打开 `Athena VIKINGYFY`，勾选 preview 运行预检。
-2. 确认运行成功，下载 `athena-b-config-*`；检查 `preflight.txt`、`protected.diff`（应为空）、`application.diff`、`final.config`。
-3. 保持同一套已通过预检的源锁与配置，取消 preview 运行正式编译。正式编译会再次执行同样的预检，失败即停止。每个产物记录实际框架提交；配置或锁文件更新后必须重新预检。
+2. 确认三个预检任务都成功，下载 `athena-b-config-firmware-*`；检查 `preflight.txt`、`protected.diff`（应为空）、`application.diff`、`final.config`，以及两个 `checkpoint-restore-*.txt`。预检仅解析配置并验证源树跨任务恢复，不编译或发布。
+3. 保持同一套已通过预检的源锁与配置，取消 preview 运行正式编译。先完成工具/工具链/内核，再完成 Rust 主机编译器，最后编译其余软件包并打包固件；三个任务串行，每个编译阶段最多五小时，保留诊断上传时间。正式编译先执行配置预检，后续任务恢复同一次运行的源树、验证源码/输入/配置哈希及底层保护证据，不重复改写应用配置。每个产物记录实际框架提交；配置或锁文件更新后必须重新预检。
 4. 成功后从 `athena-b-*` Release 下载雅典娜 Factory/Sysupgrade 和 SHA256SUMS，以及配置、manifest 和 packages。
 5. 要重建相同源配置，检出该 Release 记录的框架提交，并保持 `build.lock.tsv`。升级上游时先更新自己的框架/源码/feeds/插件锁，重新预检，不能直接切换到其他作者源码。
+
+中间检查点为 `athena-b-checkpoint-toolchain-*` / `athena-b-checkpoint-language-*`，仅保留三天。tar.zst 保存完整工作树、工具、安装目录、下载缓存及构建 stamps，保留软链接/权限/时间；SHA-256、输入指纹、源码提交和最终配置哈希均需匹配。预检检查点不能用于正式构建。签名材料不传递，在最终任务重新生成。
+
+后续阶段失败时，在同一个 Run 使用 GitHub 的 **Re-run failed jobs**，可从已成功阶段的检查点恢复；只要检查点仍未过期，不需要重编前面的成功阶段。检查点过期或变更构建输入后，需要启动新的完整 Run。原先仅在整轮成功后保存 staging_dir 的缓存策略已由阶段检查点替代。
 
 此轮保留作者默认地址 192.168.10.1、SSID OWRT、示例无线密码 12345678、初始 root 无密码。接入日常网络前设置自己的管理和无线密码。
 
