@@ -1,5 +1,7 @@
 # 构建问题与处理记录
 
+Run 37333460335 的退出来自检查脚本误匹配 python-setuptools-rust/host 后缀，配置/底层比较本身通过。已精确匹配 rust/host 并允许禁用 Ruby 选项不输出；用该 Run 下载的真实配置/packageinfo 回归：现配置无有效 Rust host 消费包，单独启用 YJIT 或 Shadowsocks Rust 均能检出。
+
 ## 无 PassWall 首次预检：Ruby YJIT 的额外 Rust 依赖
 
 Run 37331839464 同样在 Rust 消费包检查失败；A 对应 Run 37331824442 下载证据证明 Ruby 默认 YJIT 会引入 Rust host。两版应用层显式关闭 RUBY_ENABLE_YJIT，保留 OpenClash 所需 Ruby/YAML；检查按实际配置解析条件依赖，本地禁用/启用条件回归通过，不改变原生 NSS/无线/设备配置。

@@ -74,7 +74,7 @@ awk '
     /^Source-Makefile:/ {flush(); source=$2; count=0; uses_rust=0}
     /^Package:/ {names[++count]=$2}
     /^Build-Depends(\/host)?:/ {
-        for (j=2; j<=NF; j++) if ($j ~ /rust\/host$/) {
+        for (j=2; j<=NF; j++) if ($j ~ /(^|:)rust\/host$/) {
             dep=$j
             if (dep=="rust/host") uses_rust=1
             else {
@@ -87,7 +87,9 @@ awk '
     }
     END {flush(); if (bad) exit 1}
 ' .config tmp/.packageinfo > "$out/selected-rust-consumers.txt"
-grep -qx '# CONFIG_RUBY_ENABLE_YJIT is not set' .config
+if grep -Eq '^CONFIG_RUBY_ENABLE_YJIT=[ym]$' .config; then
+    echo 'Optional Ruby YJIT must remain disabled.' >&2; exit 1
+fi
 [[ ! -s "$out/selected-rust-consumers.txt" ]] || {
     cat "$out/selected-rust-consumers.txt"; echo 'Selected package still depends on Rust host.' >&2; exit 1;
 }
