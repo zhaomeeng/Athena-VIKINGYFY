@@ -100,6 +100,9 @@ case "$mode" in
         grep -qx 'PASS: protected baseline unchanged; required applications selected; exclusions satisfied.' \
             .athena-evidence/preflight.txt
         mkdir -p "$out"
+        if [[ -f "$out/runner-space.txt" ]]; then
+            mv -- "$out/runner-space.txt" "$out/runner-space-${WRT_STAGE:?}.txt"
+        fi
         cp -a .athena-evidence/. "$out/"
         while IFS='=' read -r key value; do
             case "$key" in

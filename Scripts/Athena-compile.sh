@@ -31,6 +31,8 @@ fi
 # Stop at five hours to leave time for diagnostics rather than hitting the runner's six-hour limit.
 # Each completed stage is transferred to the next job with the source tree and original stamps intact.
 export WRT_STAGE="$stage"
+# Variables are expanded by the child Bash, after timeout has established its process group.
+# shellcheck disable=SC2016
 setsid timeout --signal=TERM --kill-after=60s 300m bash -c '
     build_target() {
         make -j"$(nproc)" CONFIG_AUTOREMOVE=y "$@" || make -j1 V=s CONFIG_AUTOREMOVE=y "$@"
@@ -46,6 +48,8 @@ setsid timeout --signal=TERM --kill-after=60s 300m bash -c '
 ' &
 compiler_pid=$!
 monitor_pid=''
+# Called by the EXIT trap.
+# shellcheck disable=SC2329
 stop_children() {
     [[ -z "$monitor_pid" ]] || kill "$monitor_pid" 2>/dev/null || true
     [[ -z "${compiler_pid:-}" ]] || kill -TERM -- "-$compiler_pid" 2>/dev/null || true
