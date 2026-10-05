@@ -79,8 +79,8 @@ awk '
             if (dep=="rust/host") uses_rust=1
             else {
                 sub(/:rust\/host$/, "", dep)
-                if (dep ~ /^![A-Za-z0-9_]+$/) {sub(/^!/, "", dep); if (!enabled[dep]) uses_rust=1}
-                else if (dep ~ /^[A-Za-z0-9_]+$/) {if (enabled[dep]) uses_rust=1}
+                if (dep ~ /^![A-Za-z0-9_-]+$/) {sub(/^!/, "", dep); if (!enabled[dep]) uses_rust=1}
+                else if (dep ~ /^[A-Za-z0-9_-]+$/) {if (enabled[dep]) uses_rust=1}
                 else {print "Unsupported Rust dependency condition: " dep > "/dev/stderr"; bad=1}
             }
         }
