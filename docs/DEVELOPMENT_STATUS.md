@@ -10,10 +10,12 @@
 
 实际证据：protected.diff 为 0 字节，必需应用全部启用、删除应用全部排除；附加检查 NSS/ATH11K/IPQ/SKB_RECYCLER/CPU frequency 配置相同。Docker 自动选择 4 项 cgroup 及原生 bridge/iptables 兼容依赖，没有修改 Firewall/NSS 实现。详见 validation/preview-37241333236.json。
 
-正式编译已触发：[Run 37241920846](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37241920846)，框架提交 `4d82efacb1b456966426f8b74c3e8c2d07c0d5cc`，与预检使用同一 build.lock.tsv 和应用配置。该次编译尚未完成，不存在定制成功固件或实机验证结论。
+正式编译已失败：[Run 37241920846](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37241920846)，框架提交 `4d82efacb1b456966426f8b74c3e8c2d07c0d5cc`，与预检使用同一 build.lock.tsv 和应用配置。运行时间为 2026-10-05 06:56:45 至 08:25:32（Asia/Shanghai）。GitHub 检查注释确认 runner 磁盘耗尽：`System.IO.IOException: No space left on device`。
 
-下一步：检查正式编译结果；普通应用依赖问题按授权修复，若涉及受保护底层则停止报告。B 版成功后实施 A 版。
+本次正式运行的 Custom Settings/配置预检和 Download Packages 均成功，已下载配置证据并确认 preflight PASS、protected.diff 为 0 字节。只有配置 artifact；没有固件 artifact 或 Release。runner 异常退出后完整 job 日志不可获取（`log not found`），不推断具体软件包编译错误。
 
-阻塞：当前 Windows 没有可用 WSL Linux 发行版，实际 defconfig 与编译使用 GitHub Ubuntu runner。
+下一步：优化 runner 磁盘使用后重新编译，保留已通过预检的源码/配置/锁与底层实现。本次状态检查未修改工作流或重新触发编译。B 版成功后实施 A 版。
+
+阻塞：GitHub runner 磁盘空间耗尽；当前 Windows 没有可用 WSL Linux 发行版，实际 defconfig 与编译使用 GitHub Ubuntu runner。
 
 决策与需求：见 [BASELINE.md](BASELINE.md)、[REQUIREMENTS.md](REQUIREMENTS.md)、[OPERATIONS.md](OPERATIONS.md)。
