@@ -10,10 +10,10 @@
 
 验证：Bash 语法、ShellCheck、actionlint、差异检查通过。最新无 PassWall 预检 [Run 37335428676](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37335428676) 两个任务全部 success，工具链检查点到固件任务的恢复 PASS；protected.diff 和选中包 Rust host 依赖均为空。PassWall 1/2、Xray、Sing-box、Shadowsocks Rust 与 Ruby YJIT 均未启用，保留 OpenClash 所需 Ruby。最终配置 SHA256 为 a3dd345a4edd57d7cf0f274c282b787ccdce5f29aa95a31615a9e8396d45ccd3。预检框架 42b0e3c 与正式框架 1ff78b5 仅相差依赖条件名允许连字符的检查器修正，已用预检完整配置/包元数据复核。预检不编译固件或发布 Release，见 validation/preview-37335428676.json。
 
-旧正式构建 [Run 37297257083](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37297257083) 已按用户要求取消，之前工具链成功、Rust 阶段未完成，无固件。本轮已完成全部本地 Git 历史凭据特征/敏感文件名检查，未命中，仓库为 Public；新正式构建 [Run 37338343637](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37338343637) 已启动，框架 1ff78b5，preview=false，目前工具链任务初始化中。旧配置/检查点不复用。
+旧正式构建 [Run 37297257083](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37297257083) 已按用户要求取消。本轮已完成全部本地 Git 历史凭据特征/敏感文件名检查，未命中，仓库为 Public。[Run 37338343637](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37338343637) 工具链、固件编译均成功，交付检查错误要求 IPQ6018/amss.bin 而失败，未发布固件。已根据固定固件修订纠正为 MDT/完整分段检查，补充打包后诊断保留；Bash/ShellCheck/actionlint/差异检查通过，待修复后新正式运行。配置、源锁与底层脚本没有变化。
 
-已知事项：前两次正式构建分别因磁盘耗尽、六小时上限失败，详见 BUILD_ISSUES.md。当前仅证实未编译源树的跨任务恢复；已编译工具链复用和真实限时续编尚待本次正式运行验证。最终固件任务失败时从完整工具链检查点重新执行，不复用半成品签名材料。完整镜像内容检查与设备测试未完成。当前 Windows 无可用 WSL 发行版，实际 defconfig/编译在 GitHub Ubuntu runner 执行。
+已知事项：前两次正式构建分别因磁盘耗尽、六小时上限失败，详见 BUILD_ISSUES.md。已编译工具链复用已由 Run 37338343637 证实，真实限时续编尚未触发。最终固件任务失败时从完整工具链检查点重新执行，不复用半成品签名材料。完整镜像内容检查与设备测试未完成。当前 Windows 无可用 WSL 发行版，实际 defconfig/编译在 GitHub Ubuntu runner 执行。
 
-下一步：完成本次正式构建，核验 Factory/Sysupgrade、packages/manifest 和 SHA-256。A/B 正式流程已并行启动，底层配置独立，尚无新版固件产物。
+下一步：按用户要求启动修复后的正式编译，核验 Factory/Sysupgrade、packages/manifest 和 SHA-256。A/B 并行，底层配置独立，尚无通过交付检查的新版固件。
 
 决策与需求：见 [BASELINE.md](BASELINE.md)、[REQUIREMENTS.md](REQUIREMENTS.md)、[OPERATIONS.md](OPERATIONS.md)。

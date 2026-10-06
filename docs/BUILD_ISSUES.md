@@ -2,6 +2,14 @@
 
 Run 37333460335 的退出来自检查脚本误匹配 python-setuptools-rust/host 后缀，配置/底层比较本身通过。已精确匹配 rust/host 并允许禁用 Ruby 选项不输出；用该 Run 下载的真实配置/packageinfo 回归：现配置无有效 Rust host 消费包，单独启用 YJIT 或 Shadowsocks Rust 均能检出。
 
+## 2026-10-06 编译成功，交付文件名检查失败
+
+正式 [Run 37338343637](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37338343637) 于 02:59:46（Asia/Shanghai）失败。工具链、固件编译均 success，compile-exit=0，已编译工具链的跨任务恢复 PASS；Package Firmware 检查 lib/firmware/IPQ6018/amss.bin 失败，未上传/发布固件。不是超时、磁盘耗尽或底层编译错误。实际配置仍为 a3dd345a4edd57d7cf0f274c282b787ccdce5f29aa95a31615a9e8396d45ccd3，protected.diff 与 Rust 消费包均为空。
+
+固定源码 package/firmware/ath11k-firmware/Makefile 将 IPQ6018/hw1.0/* 装入 /lib/firmware/IPQ6018。固定固件仓库 VIKINGYFY/ath11k-firmware-ddwrt 修订 0c817c46568ef6871042c7e2efc95ac24a1f02e6 含 q6_fw.mdt、m3_fw.mdt 及分段文件，并无 IPQ6018/amss.bin；QCN9074 则确有 amss.bin。修正交付检查，要求元数据、board-2.bin 和全部非空分段，不修改任何无线配置、固件包、NSS 或设备定义。追加打包之后 always 上传的镜像检查诊断，以保留失败时的 rootfs 清单。
+
+Bash、ShellCheck、actionlint、git diff --check 通过。修正后的实际镜像检查与交付仍需新正式构建验证。
+
 ## 无 PassWall 首次预检：Ruby YJIT 的额外 Rust 依赖
 
 Run 37331839464 同样在 Rust 消费包检查失败；A 对应 Run 37331824442 下载证据证明 Ruby 默认 YJIT 会引入 Rust host。两版应用层显式关闭 RUBY_ENABLE_YJIT，保留 OpenClash 所需 Ruby/YAML；检查按实际配置解析条件依赖，本地禁用/启用条件回归通过，不改变原生 NSS/无线/设备配置。

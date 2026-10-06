@@ -299,6 +299,15 @@ jobs:
           cd ./wrt/
           bash "$GITHUB_WORKSPACE/Scripts/Athena-package.sh"
 
+      - name: Save image inspection diagnostics
+        if: ${{ always() && inputs.WRT_STAGE == 'firmware' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: athena-b-image-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: warn
+
       - name: Save firmware artifact
         if: ${{ !inputs.WRT_TEST && inputs.WRT_STAGE == 'firmware' && success() }}
         uses: actions/upload-artifact@v4

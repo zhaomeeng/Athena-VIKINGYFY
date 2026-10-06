@@ -19,9 +19,18 @@ done
 unsquashfs_bin="$PWD/staging_dir/host/bin/unsquashfs4"
 [[ -x "$unsquashfs_bin" ]]
 "$unsquashfs_bin" -o 6291456 -ll "$factory_image" > "$out/athena-rootfs.txt"
-for path in 'lib/firmware/ath11k/QCN9074/hw1.0/amss.bin' 'lib/firmware/IPQ6018/amss.bin' 'etc/openclash/core/clash_meta' 'etc/init.d/openclash' 'usr/bin/dockerd' 'usr/bin/docker' 'etc/uci-defaults/99-athena-services'; do
+for path in 'lib/firmware/ath11k/QCN9074/hw1.0/amss.bin' 'lib/firmware/IPQ6018/q6_fw.mdt' \
+    'lib/firmware/IPQ6018/m3_fw.mdt' 'lib/firmware/IPQ6018/board-2.bin' \
+    'etc/openclash/core/clash_meta' 'etc/init.d/openclash' 'usr/bin/dockerd' 'usr/bin/docker' 'etc/uci-defaults/99-athena-services'; do
     grep -Fq "$path" "$out/athena-rootfs.txt" || { echo "Missing Athena rootfs path: $path" >&2; exit 1; }
 done
+# Pinned IPQ6018 revision 0c817c4 uses MDT metadata and split firmware segments.
+for name in q6_fw.b00 q6_fw.b01 q6_fw.b02 q6_fw.b03 q6_fw.b04 q6_fw.b05 q6_fw.b07 q6_fw.b08 \
+    m3_fw.b00 m3_fw.b01 m3_fw.b02; do
+    "$unsquashfs_bin" -o 6291456 -cat "$factory_image" "lib/firmware/IPQ6018/$name" > "$out/firmware-segment.tmp"
+    [[ -s "$out/firmware-segment.tmp" ]] || { echo "Empty IPQ6018 segment: $name" >&2; exit 1; }
+done
+rm -- "$out/firmware-segment.tmp"
 if grep -Eq 'squashfs-root/etc/(init.d/passwall2?|config/passwall2?)([[:space:]]|$)' "$out/athena-rootfs.txt"; then
     echo 'Excluded PassWall files found in Athena rootfs.' >&2; exit 1
 fi
