@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-06",
+  "run_url": "https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37397400157",
+  "created_at": "2026-10-06T01:05:40Z",
+  "framework_commit": "1ce469a4dfa221930f93ccf43f5f03ee0bf48fd1",
+  "preview": false,
+  "observed_status": "in_progress: toolchain initialization",
+  "previous_formal_run": 37338343637,
+  "previous_result": "toolchain and firmware compilation succeeded; Package Firmware failed on nonexistent IPQ6018/amss.bin",
+  "previous_config_sha256": "a3dd345a4edd57d7cf0f274c282b787ccdce5f29aa95a31615a9e8396d45ccd3",
+  "config_source_and_native_bottom_unchanged": true,
+  "fixes": ["Check pinned IPQ6018 MDT metadata and every nonempty split firmware segment", "Save rootfs inspection diagnostics even if delivery validation fails"],
+  "firmware_revision_evidence": "VIKINGYFY/ath11k-firmware-ddwrt:0c817c46568ef6871042c7e2efc95ac24a1f02e6",
+  "local_checks": ["Bash syntax PASS", "ShellCheck PASS", "actionlint PASS", "git diff --check PASS", "native GENERAL/IPQ60XX-WIFI-YES/Handles/Settings unchanged"],
+  "real_fixed_image_validation": "pending new formal build",
+  "firmware_available": false,
+  "device_validation": "not performed"
+}

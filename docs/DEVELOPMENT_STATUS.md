@@ -2,6 +2,8 @@
 
 更新时间：2026-10-06（Asia/Shanghai）。
 
+当前运行：分段固件检查和打包后诊断修复已推送，正式 [Run 37397400157](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37397400157) 于 09:05:40（Asia/Shanghai）启动，框架 1ce469a，preview=false；工具链任务初始化中。新 Run 从固定源码完整重编，配置不变，尚无通过交付检查的固件。启动证据见 [validation/build-37397400157-start.json](validation/build-37397400157-start.json)。
+
 当前目标：按用户最新指令移除 PassWall 1/2 及专用核心，两仓库公开，A/B 独立并行重编。
 
 已完成：检查框架/源码/作者发布；保留 IPQ60XX-WIFI-YES 和 GENERAL；添加应用层 overlay、源锁、默认关闭服务、预检保护和完整交付流程。
