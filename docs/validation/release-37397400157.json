@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-06",
+  "release_url": "https://github.com/zhaomeeng/Athena-VIKINGYFY/releases/tag/athena-b-37397400157",
+  "release_id": 404295561,
+  "published": true,
+  "source_run": 37397400157,
+  "source_run_conclusion": "failure only at original Release upload",
+  "compile_and_image_checks": "success",
+  "framework_commit": "1ce469a4dfa221930f93ccf43f5f03ee0bf48fd1",
+  "publication_fix_commit": "f29412baa2dcffb2212117144a64a8318b08c274",
+  "asset_count": 38,
+  "all_remote_asset_digests_verified": true,
+  "verification_method": "36 existing nonempty asset digests matched original build SHA256SUMS; archive and updated manifest checked after upload and after publication",
+  "firmware_and_packages_unchanged": true,
+  "empty_evidence_files": [
+    "protected.diff",
+    "selected-rust-consumers.txt"
+  ],
+  "release_sha256sums": "49240d8b3e9689bb531f4d2112daec44a8604bbc199ab62550c1e0002971139b",
+  "key_assets": [
+    {
+      "name": "empty-evidence.tar.gz",
+      "size": 154,
+      "digest": "sha256:63e64db2841f9b320ba59f93c9f4671c8897300b57225f66a6375a616ed7f1bd"
+    },
+    {
+      "name": "final.config",
+      "size": 340137,
+      "digest": "sha256:a3dd345a4edd57d7cf0f274c282b787ccdce5f29aa95a31615a9e8396d45ccd3"
+    },
+    {
+      "name": "immortalwrt-qualcommax-ipq60xx-jdcloud_re-cs-02-squashfs-factory.bin",
+      "size": 133704123,
+      "digest": "sha256:5e8da917b9a3e024e4b13a47b7572c71dd129e000912cf36903ed1d50783f5c0"
+    },
+    {
+      "name": "immortalwrt-qualcommax-ipq60xx-jdcloud_re-cs-02-squashfs-sysupgrade.bin",
+      "size": 133314832,
+      "digest": "sha256:1f5c9abeefd9f29c8d1a9488afbd79abe288cb84b01b456aeb663e150097be08"
+    },
+    {
+      "name": "packages.tar.gz",
+      "size": 141775496,
+      "digest": "sha256:7048b694d1850fec56e1d03cbd504392cf678ee2e42db8bd99aae34f9e57c6cf"
+    }
+  ],
+  "device_validation": "not performed"
+}

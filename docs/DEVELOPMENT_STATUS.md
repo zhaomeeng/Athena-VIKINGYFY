@@ -2,7 +2,7 @@
 
 更新时间：2026-10-06（Asia/Shanghai）。
 
-当前状态：[Run 37397400157](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37397400157)（构建框架 1ce469a）工具链/固件编译、根文件系统交付检查和固件 artifact 上传全部成功；仅 Release 的两个零字节证据上传失败。实际配置 SHA256 与预检相同，底层保护和 Rust 消费包差异为空；IPQ6018 MDT/分段、QCN9074、OpenClash 和 Docker 镜像检查通过。已修复非空发布准备与来源标签，正在补齐并发布现有草稿；36 个非空资产的远端摘要已逐项匹配原清单，无需重新编译。
+当前状态：[Run 37397400157](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37397400157)（构建框架 1ce469a）工具链/固件编译、根文件系统交付检查和固件 artifact 上传全部成功；原 Release 的两个零字节证据上传失败已修复。[B 版 Release](https://github.com/zhaomeeng/Athena-VIKINGYFY/releases/tag/athena-b-37397400157) 已公开，38 个资产的远端摘要与发布清单全部匹配，标签核对为原构建提交，固件/软件包字节未改变。实际配置 SHA256 与预检相同，底层保护和 Rust 消费包差异为空；IPQ6018 MDT/分段、QCN9074、OpenClash 和 Docker 镜像检查通过。证据见 validation/release-37397400157.json。设备运行尚未验证。
 
 当前目标：按用户最新指令移除 PassWall 1/2 及专用核心，两仓库公开，A/B 独立并行重编。
 
@@ -16,6 +16,6 @@
 
 已知事项：前两次正式构建分别因磁盘耗尽、六小时上限失败，详见 BUILD_ISSUES.md。已编译工具链复用已由 Run 37338343637 证实，真实限时续编尚未触发。最终固件任务失败时从完整工具链检查点重新执行，不复用半成品签名材料。完整镜像内容检查与设备测试未完成。当前 Windows 无可用 WSL 发行版，实际 defconfig/编译在 GitHub Ubuntu runner 执行。
 
-下一步：完成 Release 补发和远端清单核对，下载后在刷机电脑再次校验 SHA-256；实机启动、NSS、有线和 Wi-Fi 80/160MHz 验证待用户执行。A/B 底层配置仍独立。
+下一步：下载后在刷机电脑再次校验 SHA-256；实机启动、NSS、有线和 Wi-Fi 80/160MHz 验证待用户执行。A/B 底层配置仍独立，无云端编译/发布阻塞。
 
 决策与需求：见 [BASELINE.md](BASELINE.md)、[REQUIREMENTS.md](REQUIREMENTS.md)、[OPERATIONS.md](OPERATIONS.md)。

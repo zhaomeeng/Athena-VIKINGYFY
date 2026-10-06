@@ -6,6 +6,8 @@
 
 修复应用层发布准备：校验原 SHA256SUMS，空证据收入 empty-evidence.tar.gz，重新为实际发布的资产集合生成清单；softprops 发布使用独立 release-upload，target_commitish 固定为实际构建框架提交。已有草稿的非空资产逐项用 GitHub digest 对照原清单，原固件/包不重传；补充归档，仅更新发布校验清单，固定原构建目标后发布草稿。修复没有改变源锁、GENERAL、IPQ60XX-WIFI-YES、Handles 或 Settings，不需要因上传错误重编固件。
 
+补发完成：[Release athena-b-37397400157](https://github.com/zhaomeeng/Athena-VIKINGYFY/releases/tag/athena-b-37397400157) 公开，全部 38 个资产与发布清单摘要匹配，标签为原构建 1ce469a。原 Actions Run 仍显示发布步骤失败的历史结论；固件通过编译与交付校验，设备测试尚未完成。
+
 Run 37333460335 的退出来自检查脚本误匹配 python-setuptools-rust/host 后缀，配置/底层比较本身通过。已精确匹配 rust/host 并允许禁用 Ruby 选项不输出；用该 Run 下载的真实配置/packageinfo 回归：现配置无有效 Rust host 消费包，单独启用 YJIT 或 Shadowsocks Rust 均能检出。
 
 ## 2026-10-06 编译成功，交付文件名检查失败
