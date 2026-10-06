@@ -14,7 +14,7 @@
 
 旧正式构建 [Run 37297257083](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37297257083) 已按用户要求取消。本轮已完成全部本地 Git 历史凭据特征/敏感文件名检查，未命中，仓库为 Public。[Run 37338343637](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37338343637) 工具链、固件编译均成功，交付检查错误要求 IPQ6018/amss.bin 而失败，未发布固件。已根据固定固件修订纠正为 MDT/完整分段检查，补充打包后诊断保留；Bash/ShellCheck/actionlint/差异检查通过，待修复后新正式运行。配置、源锁与底层脚本没有变化。
 
-已知事项：前两次正式构建分别因磁盘耗尽、六小时上限失败，详见 BUILD_ISSUES.md。已编译工具链复用已由 Run 37338343637 证实，真实限时续编尚未触发。最终固件任务失败时从完整工具链检查点重新执行，不复用半成品签名材料。完整镜像内容检查与设备测试未完成。当前 Windows 无可用 WSL 发行版，实际 defconfig/编译在 GitHub Ubuntu runner 执行。
+已知事项：前两次正式构建分别因磁盘耗尽、六小时上限失败，详见 BUILD_ISSUES.md。已编译工具链复用已由 Run 37338343637 证实，真实限时续编尚未触发。最终固件任务失败时从完整工具链检查点重新执行，不复用半成品签名材料。镜像内容检查已通过，设备测试未完成。当前 Windows 无可用 WSL 发行版，实际 defconfig/编译在 GitHub Ubuntu runner 执行。
 
 下一步：下载后在刷机电脑再次校验 SHA-256；实机启动、NSS、有线和 Wi-Fi 80/160MHz 验证待用户执行。A/B 底层配置仍独立，无云端编译/发布阻塞。
 
