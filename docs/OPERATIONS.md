@@ -35,3 +35,7 @@ OpenClash：导入自己的配置，启用服务；核查国内站点、Google/C
 最后启用 Docker：配置持久化存储路径，运行 dockerd，检查 bridge、DNS、NSS/Firewall、内存和日志。不要为了 Docker 修改 NSS、无线或作者的 Firewall 核心实现。
 
 首次关闭只控制默认状态，不替代用户启用服务前的检查。
+
+## 发布资产与零字节证据
+
+Release 发布前由 Scripts/Athena-release-assets.sh 校验原 Actions 产物，非空文件保持原样，正常为空的保护差异和 Rust 消费包证据收入 empty-evidence.tar.gz。Release 的 SHA256SUMS 对应实际发布资产；原 Actions artifact 与原清单不变。仅上传失败时优先校验并补发已通过镜像检查的原产物，不为了发布错误重新编译。标签指向实际构建的框架提交。

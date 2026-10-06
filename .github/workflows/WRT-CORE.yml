@@ -308,6 +308,10 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
+      - name: Prepare Release assets
+        if: ${{ !inputs.WRT_TEST && inputs.WRT_STAGE == 'firmware' && success() }}
+        run: bash Scripts/Athena-release-assets.sh wrt/upload release-upload
+
       - name: Save firmware artifact
         if: ${{ !inputs.WRT_TEST && inputs.WRT_STAGE == 'firmware' && success() }}
         uses: actions/upload-artifact@v4
@@ -321,7 +325,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: athena-b-${{ github.run_id }}
-          files: ./wrt/upload/*
+          target_commitish: ${{ github.sha }}
+          files: ./release-upload/*
           body: |
             京东云雅典娜 RE-CS-02 / B版。云端编译产物，设备运行验证待完成。
             框架提交：${{ github.sha }}
@@ -330,3 +335,4 @@ jobs:
             作者 IPQ60XX-WIFI-YES 基线的受保护配置预检通过。
             固件不包含 PassWall 1/2；首次启动 OpenClash、Docker 均关闭，先完成有线与 80/160MHz 测试。
             使用 SHA256SUMS 核对下载文件。升级操作与服务切换见 docs/OPERATIONS.md。
+            零字节诊断证据保存在 empty-evidence.tar.gz，原 Actions 产物不变。

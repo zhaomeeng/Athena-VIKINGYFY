@@ -1,5 +1,11 @@
 # 构建问题与处理记录
 
+## 2026-10-06 两版编译已成功，B 的空资产上传失败
+
+[Run 37397400157](https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/37397400157) 工具链/最终固件编译、Package Firmware 和 Save firmware artifact 全部成功；Release Firmware 因零字节诊断文件被 GitHub 拒绝（size must be greater than or equal to 1）而失败。草稿 Release 404295561 已有 36 个非空构建资产及原 SHA256SUMS；只有 protected.diff、selected-rust-consumers.txt 两个空文件未能上传。原固件 artifact 为 11388558797，设备运行验证仍未完成。
+
+修复应用层发布准备：校验原 SHA256SUMS，空证据收入 empty-evidence.tar.gz，重新为实际发布的资产集合生成清单；softprops 发布使用独立 release-upload，target_commitish 固定为实际构建框架提交。已有草稿的非空资产逐项用 GitHub digest 对照原清单，原固件/包不重传；补充归档，仅更新发布校验清单，固定原构建目标后发布草稿。修复没有改变源锁、GENERAL、IPQ60XX-WIFI-YES、Handles 或 Settings，不需要因上传错误重编固件。
+
 Run 37333460335 的退出来自检查脚本误匹配 python-setuptools-rust/host 后缀，配置/底层比较本身通过。已精确匹配 rust/host 并允许禁用 Ruby 选项不输出；用该 Run 下载的真实配置/packageinfo 回归：现配置无有效 Rust host 消费包，单独启用 YJIT 或 Shadowsocks Rust 均能检出。
 
 ## 2026-10-06 编译成功，交付文件名检查失败
