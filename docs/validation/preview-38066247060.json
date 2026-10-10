@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-11",
+  "run_url": "https://github.com/zhaomeeng/Athena-VIKINGYFY/actions/runs/38066247060",
+  "framework_commit": "14ce3bdb9d8cc071907b9da54b989ab1adb39f4c",
+  "source_commit": "0fb9b10cb9df51fb076470e1dd93d1c30dd89d83",
+  "run_conclusion": "success",
+  "stage_conclusions": {
+    "toolchain": "success",
+    "firmware": "success"
+  },
+  "preflight": "PASS",
+  "protected_diff_bytes": 0,
+  "selected_rust_consumers_bytes": 0,
+  "included_packages": [
+    "luci-app-openclash",
+    "luci-app-passwall2",
+    "luci-i18n-passwall2-zh-cn",
+    "xray-core",
+    "sing-box",
+    "docker",
+    "dockerd"
+  ],
+  "passwall2_basic_core": "All (Xray and Sing-box)",
+  "passwall2_transparent_proxy": "nftables",
+  "excluded_packages": [
+    "luci-app-passwall",
+    "shadowsocks-rust programs",
+    "sing-box-tiny"
+  ],
+  "ruby_yjit_enabled": false,
+  "final_config_sha256": "bd6618a019b5b65757e572160d9db2d07d50094a5fd003edfcbbebc33bad7746",
+  "checkpoint_restore": "PASS: toolchain checkpoint restored with matching source, inputs, config, modes and symlinks.",
+  "firmware_job_config_matches_toolchain_job": true,
+  "compile_and_release": "skipped in preview",
+  "compiled_tree_reuse": "prior two-stage build validated this; this preview transfers prepared source only",
+  "device_validation": "user reported previous OpenClash-only A/B images work; new PassWall2 image not yet tested"
+}
