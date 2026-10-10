@@ -36,6 +36,8 @@ diff -u "$out/baseline.config" "$out/final.config" > "$out/application.diff" || 
 required=(luci luci-app-firewall luci-app-package-manager luci-theme-aurora luci-app-aurora-config
     luci-app-fullconenat-sonic fullconenat-sonic luci-app-autoreboot luci-app-mini-diskmanager
     luci-app-samba4 luci-app-partexp luci-app-upnp luci-app-wolultra luci-app-openclash
+    luci-app-passwall2 luci-i18n-passwall2-zh-cn xray-core sing-box
+    chinadns-ng geoview v2ray-geoip v2ray-geosite
     luci-app-lucky luci-app-ttyd docker dockerd containerd runc
     dnsmasq-full kmod-qca-nss-drv kmod-qca-nss-ecm
     kmod-ath11k kmod-ath11k-pci kmod-usb-storage mmc-utils)
@@ -45,14 +47,23 @@ done
 grep -qx 'CONFIG_TARGET_DEVICE_qualcommax_ipq60xx_DEVICE_jdcloud_re-cs-02=y' .config
 grep -Eq '^CONFIG_PACKAGE_ath11k-firmware-qcn9074-ddwrt=[ym]$' .config
 grep -A15 '^define Device/jdcloud_re-cs-02$' target/linux/qualcommax/image/ipq60xx.mk | grep -q 'ath11k-firmware-qcn9074-ddwrt'
-for name in homeproxy gecoosac natmapt passwall passwall2 ssr-plus nikki momo adguardhome mosdns smartdns sqm easytier oaf vlmcsd store istorex attendedsysupgrade; do
+for key in Basic_Core_All Nftables_Transparent_Proxy; do
+    grep -qx "CONFIG_PACKAGE_luci-app-passwall2_$key=y" .config || {
+        echo "Required PassWall2 option missing: $key" >&2; exit 1;
+    }
+done
+for key in Iptables_Transparent_Proxy INCLUDE_Shadowsocks_Rust_Client INCLUDE_Shadowsocks_Rust_Server; do
+    if grep -Eq "^CONFIG_PACKAGE_luci-app-passwall2_$key=[ym]$" .config; then
+        echo "Excluded PassWall2 option selected: $key" >&2; exit 1
+    fi
+done
+for name in homeproxy gecoosac natmapt passwall ssr-plus nikki momo adguardhome mosdns smartdns sqm easytier oaf vlmcsd store istorex attendedsysupgrade; do
     if grep -Eq "^CONFIG_PACKAGE_luci-app-$name=[ym]$" .config; then
         echo "Excluded application selected: $name" >&2; exit 1
     fi
 done
-for name in xray-core sing-box rust shadowsocks-rust-sslocal shadowsocks-rust-ssserver \
-    shadowsocks-rust-ssmanager shadowsocks-rust-ssservice shadowsocks-rust-ssurl \
-    shadowsocksr-libev-ssr-local simple-obfs-client v2ray-plugin; do
+for name in rust sing-box-tiny shadowsocks-rust-sslocal shadowsocks-rust-ssserver \
+    shadowsocks-rust-ssmanager shadowsocks-rust-ssservice shadowsocks-rust-ssurl; do
     if grep -Eq "^CONFIG_PACKAGE_$name=[ym]$" .config; then
         echo "Excluded proxy backend selected: $name" >&2; exit 1
     fi

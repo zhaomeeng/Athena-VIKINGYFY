@@ -2,7 +2,9 @@
 
 ## 当前生效的后续决定
 
-用户最新明确要求：取消含 PassWall 的两条构建，两个固件均删除 PassWall 1/2 及不再需要的专用核心；只保留 OpenClash 作为代理，首次启动 OpenClash、Docker 关闭。两仓库均公开，移除专用 Rust 编译任务，真实 defconfig/保护检查通过后并行重新编译。下文为原始交接记录，其中 PassWall2 备用、等待 B 成功再编译 A 的约定已被本决定替代；其余底层保护和交付要求继续有效。
+2026-10-11 当前任务：用户明确要求 B 版保留 OpenClash，额外增加 PassWall2，然后重新编译。PassWall2 包含 Xray、Sing-box 和中文界面，使用原生 nftables 透明代理选项；关闭可选 Shadowsocks Rust 和 Ruby YJIT，保持没有 Rust host 消费包的两阶段构建。首次启动 OpenClash、PassWall2、Docker 关闭，两套代理按需切换。保持现有源码/feeds/插件锁与作者底层配置，先真实 defconfig/保护检查再正式编译。本次只修改 B；A 继续保持上一版配置。用户已反馈此前 A/B 均能正常使用，新加 PassWall2 的固件仍需单独验证。
+
+历史决定：两仓库已公开，上一轮 A/B 均删除 PassWall 1/2 及专用核心，取消独立 Rust 编译任务。下文为原始交接记录；与本节冲突的编译顺序、应用选择以本节为准，其余底层保护和交付要求继续有效。
 
 ## 一、任务目标
 

@@ -333,6 +333,7 @@ jobs:
             源码：${{ env.WRT_REPO }}
             源码提交：${{ env.WRT_HASH }}
             作者 IPQ60XX-WIFI-YES 基线的受保护配置预检通过。
-            固件不包含 PassWall 1/2；首次启动 OpenClash、Docker 均关闭，先完成有线与 80/160MHz 测试。
+            固件保留 OpenClash，新增 PassWall2（Xray/Sing-box，nftables），不包含 PassWall 1 或 Shadowsocks Rust。
+            首次启动 OpenClash、PassWall2、Docker 均关闭；两套代理按需切换，不同时接管透明代理。
             使用 SHA256SUMS 核对下载文件。升级操作与服务切换见 docs/OPERATIONS.md。
             零字节诊断证据保存在 empty-evidence.tar.gz，原 Actions 产物不变。

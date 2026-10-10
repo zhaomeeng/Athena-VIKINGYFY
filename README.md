@@ -1,6 +1,6 @@
 # 高质量<免费>交流群
 
-本仓库维护京东云雅典娜 B 版：VIKINGYFY 原生 IPQ60XX-WIFI-YES + ImmortalWrt。按用户最新指令公开仓库，固件移除 PassWall 1/2，仅保留 OpenClash 作为代理。手动入口为 **Athena VIKINGYFY**，先 preview 再编译；状态见 [开发状态](docs/DEVELOPMENT_STATUS.md)，构建与升级见 [操作说明](docs/OPERATIONS.md)。以下保留作者通用说明。
+本仓库维护京东云雅典娜 B 版：VIKINGYFY 原生 IPQ60XX-WIFI-YES + ImmortalWrt。仓库公开，固件保留 OpenClash，额外加入 PassWall2（Xray/Sing-box，nftables），不包含 PassWall 1 或 Shadowsocks Rust。首次启动两套代理及 Docker 均关闭，代理按需切换。手动入口为 **Athena VIKINGYFY**，先 preview 再编译；状态见 [开发状态](docs/DEVELOPMENT_STATUS.md)，构建与升级见 [操作说明](docs/OPERATIONS.md)。以下保留作者通用说明。
 
 [IPQ技术讨论群](https://qm.qq.com/q/v7nMhzB4oU)
 

@@ -21,7 +21,9 @@ unsquashfs_bin="$PWD/staging_dir/host/bin/unsquashfs4"
 "$unsquashfs_bin" -o 6291456 -ll "$factory_image" > "$out/athena-rootfs.txt"
 for path in 'lib/firmware/ath11k/QCN9074/hw1.0/amss.bin' 'lib/firmware/IPQ6018/q6_fw.mdt' \
     'lib/firmware/IPQ6018/m3_fw.mdt' 'lib/firmware/IPQ6018/board-2.bin' \
-    'etc/openclash/core/clash_meta' 'etc/init.d/openclash' 'usr/bin/dockerd' 'usr/bin/docker' 'etc/uci-defaults/99-athena-services'; do
+    'etc/openclash/core/clash_meta' 'etc/init.d/openclash' 'etc/init.d/passwall2' \
+    'usr/share/passwall2/0_default_config' 'usr/bin/xray' 'usr/bin/sing-box' \
+    'usr/bin/dockerd' 'usr/bin/docker' 'etc/uci-defaults/99-athena-services'; do
     grep -Fq "$path" "$out/athena-rootfs.txt" || { echo "Missing Athena rootfs path: $path" >&2; exit 1; }
 done
 # Pinned IPQ6018 revision 0c817c4 uses MDT metadata and split firmware segments.
@@ -31,9 +33,15 @@ for name in q6_fw.b00 q6_fw.b01 q6_fw.b02 q6_fw.b03 q6_fw.b04 q6_fw.b05 q6_fw.b0
     [[ -s "$out/firmware-segment.tmp" ]] || { echo "Empty IPQ6018 segment: $name" >&2; exit 1; }
 done
 rm -- "$out/firmware-segment.tmp"
-if grep -Eq 'squashfs-root/etc/(init.d/passwall2?|config/passwall2?)([[:space:]]|$)' "$out/athena-rootfs.txt"; then
-    echo 'Excluded PassWall files found in Athena rootfs.' >&2; exit 1
+if grep -Eq 'squashfs-root/etc/(init.d/passwall|config/passwall)([[:space:]]|$)' "$out/athena-rootfs.txt"; then
+    echo 'Excluded PassWall 1 files found in Athena rootfs.' >&2; exit 1
 fi
+"$unsquashfs_bin" -o 6291456 -cat "$factory_image" etc/uci-defaults/99-athena-services > "$out/service-defaults.txt"
+for line in "uci -q set openclash.config.enable='0'" "uci -q set passwall2.@global[0].enabled='0'" \
+    'for service in openclash passwall2 passwall2_server xray sing-box dockerd; do'; do
+    grep -Fxq "$line" "$out/service-defaults.txt" || { echo 'Missing service shutdown default.' >&2; exit 1; }
+done
+cp "$out/service-defaults.txt" upload/
 cp "$out/athena-rootfs.txt" upload/
 for database in lib/apk/db/installed usr/lib/opkg/status; do
     if grep -Fq "squashfs-root/$database" "$out/athena-rootfs.txt"; then
@@ -41,11 +49,20 @@ for database in lib/apk/db/installed usr/lib/opkg/status; do
     fi
 done
 [[ -s upload/athena-packages.db ]]
-for name in luci-app-passwall luci-app-passwall2 xray-core sing-box shadowsocks-rust-sslocal; do
+for name in luci-app-openclash luci-app-passwall2 luci-i18n-passwall2-zh-cn xray-core sing-box docker dockerd; do
+    grep -Eq "^(P:$name|Package: $name)$" upload/athena-packages.db || {
+        echo "Required image package missing: $name" >&2; exit 1;
+    }
+done
+for name in luci-app-passwall sing-box-tiny shadowsocks-rust-sslocal shadowsocks-rust-ssserver \
+    shadowsocks-rust-ssmanager shadowsocks-rust-ssservice shadowsocks-rust-ssurl; do
     if grep -Eq "^(P:$name|Package: $name)$" upload/athena-packages.db; then
         echo "Excluded image package: $name" >&2; exit 1
     fi
 done
+printf 'PASS: Athena firmware, OpenClash/Mihomo, PassWall2/Xray/Sing-box, Docker and service defaults inspected.\n' \
+    | tee "$out/image-validation.txt"
+cp "$out/image-validation.txt" upload/
 find "$target" -maxdepth 1 -type f \( -name '*.manifest' -o -name '*buildinfo' -o -name 'profiles.json' \) -exec cp {} upload/ \;
 # Retain generated package repositories, including modules and APK/IPK metadata.
 tar -czf upload/packages.tar.gz bin/packages "$target/packages"
